@@ -1,0 +1,65 @@
+:root {
+  --text-color-default: #262626;
+  --text-color-darkmode: #B0B3B8;
+  --bg-color-default: #fafafa;
+  --bg-color-darkmode: #18191A;
+}
+
+body {
+ margin: 0;
+ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+   'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+   sans-serif;
+ -webkit-font-smoothing: antialiased;
+ -moz-osx-font-smoothing: grayscale;
+ color: var(--text-color-default);
+ background-color: var(--bg-color-default);
+}
+
+code {
+ font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+   monospace;
+}
+
+a {
+  text-decoration: none;
+}
+
+a.active {
+  color: #ce93d8 !important;
+}
+
+.darkmode-color {
+  color: var(--text-color-darkmode) !important;
+}
+
+.darkmode-bg-color {
+  background-color: var(--bg-color-darkmode) !important;
+}
+
+::-webkit-scrollbar {
+ width: 8px;
+}
+
+
+::-webkit-scrollbar-track {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track:hover {
+ background: #f1f1f13b;
+}
+
+::-webkit-scrollbar-thumb {
+ background: #b0b3b8bb;
+ border-radius: 5px;
+}
+/* 
+::-webkit-scrollbar-thumb:hover {
+ background: #9ea1a4;
+} */
+
+.me {
+  flex-direction: row-reverse;
+  margin-right: 20px;
+}
