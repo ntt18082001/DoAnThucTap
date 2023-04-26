@@ -29,7 +29,6 @@ const MessageLayout: React.FC = (props: MessageProps): JSX.Element => {
 			<Suspense fallback={<LinearProgress color='secondary' />}>
 				<Outlet />
 			</Suspense>
-			<MessageInfo />
 		</Grid>
 	);
 }

@@ -1,157 +1,170 @@
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { CardHeader, Grid, IconButton, Skeleton, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Grid, IconButton, Typography } from '@mui/material';
+import React from 'react';
 
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { blackColor, borderColorDarkmode, borderColorDefault, colorMsgDarkmode, mainColor } from '../../../constants';
+import {
+  blackColor,
+  borderColorDarkmode,
+  borderColorDefault,
+  colorMsgDarkmode,
+  mainColor,
+} from '../../../constants';
 import { selectIsDarkmode } from '../../darkmode/darkmodeSlice';
-import { selectSelectedUser, setSelectedUser } from '../messageSlice';
+import { selectConversations, selectSelectedUserId, setSeenLastMessage, setSelectedUser } from '../messageSlice';
 import MessageListItem from './MessageListItem';
+import SkeletonMessage from './SkeletonMessage';
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import FindUserMsg from './FindUserMsg';
+import { selectUserId } from 'features/auth/authSlice';
+import { Message, SeenMessage, UserMessage } from 'models/messages.model';
+import { useSeenMessageMutation } from '../message.service';
+import { useEffect } from 'react';
 
 type Props = {};
 
 function MessageList(props: Props) {
-	const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
 
-	const isDarkmode = useAppSelector(selectIsDarkmode);
-	const dispatch = useAppDispatch();
+  const currentUserId = useAppSelector(selectUserId);
+  const selectedUserId = useAppSelector(selectSelectedUserId);
+  const listConversation = useAppSelector(selectConversations);
 
-	const borderColor = isDarkmode ? borderColorDarkmode : borderColorDefault;
-	const colorText = isDarkmode ? mainColor : blackColor;
-	const bgColor = isDarkmode ? 'rgb(255,255,255,.1)' : colorMsgDarkmode;
-	const bgColorHover = isDarkmode ? 'rgb(255,255,255,.2)' : "#dbdbdb";
-	const bgColorSkeleton = isDarkmode ? 'grey.700' : '';
+  const isDarkmode = useAppSelector(selectIsDarkmode);
+  const borderColor = isDarkmode ? borderColorDarkmode : borderColorDefault;
+  const colorText = isDarkmode ? mainColor : blackColor;
+  const bgColor = isDarkmode ? 'rgb(255,255,255,.1)' : colorMsgDarkmode;
+  const bgColorHover = isDarkmode ? 'rgb(255,255,255,.2)' : '#dbdbdb';
 
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setIsLoading(false);
-		}, 2000);
+  const [seenMessage, { data, isSuccess }] = useSeenMessageMutation();
 
-		return () => {
-			clearTimeout(timer);
-		}
-	}, []);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
-	return (
-		<Grid
-			item
-			xs={5}
-			sm={5}
-			md={4}
-			lg={3}
-			sx={{ borderRight: borderColor, paddingTop: 1, paddingRight: 1, paddingLeft: 2 }}
-		>
-			<Grid container>
-				<Grid
-					item
-					xs
-					container
-					alignItems="center"
-				>
-					<Typography
-						variant="h5"
-						sx={{
-							fontWeight: 'bold',
-							fontSize: '1.5rem',
-							color: isDarkmode ? colorMsgDarkmode : blackColor
-						}}
-					>
-						Chat
-					</Typography>
-				</Grid>
-				<Grid item xs>
-					<Typography
-						variant="h5"
-						textAlign="end"
-						sx={{
-							fontWeight: 'bold',
-							fontSize: '1.5rem',
-							color: '#E4E6EB',
-							marginRight: 1
-						}}
-					>
-						<IconButton
-							aria-label="Tùy chọn"
-							size="large"
-							sx={{
-								color: colorText,
-								backgroundColor: bgColor,
-								":hover": {
-									backgroundColor: bgColorHover
-								}
-							}}
-						>
-							<MoreHorizIcon />
-						</IconButton>
-					</Typography>
-				</Grid>
-			</Grid>
-			<Grid container sx={{ mt: 2, overflowY: "auto", maxHeight: '568px' }}>
-				{/* {
-					!isLoading ? (
-						listUserTalked.map(user => (
-							<MessageListItem
-								key={user.id}
-								user={user}
-								onClick={() => {
-									dispatch(setSelectedUser(user));
-								}}
-							/>
-						))
-					) : (
-						<>
-							<CardHeader
-								sx={{ width: '100%', backgroundColor: bgColor, mb: 0.5 }}
-								avatar={
-									<Skeleton
-										animation="pulse"
-										variant="circular"
-										width={50}
-										height={50}
-										sx={{ bgcolor: bgColorSkeleton }}
-									/>
-								}
-								title={
-									<Skeleton
-										animation="pulse"
-										height={15}
-										width="80%"
-										sx={{ bgcolor: bgColorSkeleton, mb: '6px' }}
-									/>
-								}
-								subheader={
-									<Skeleton animation="pulse" height={12} width="50%" sx={{ bgcolor: bgColorSkeleton }} />
-								}
-							/>
-							<CardHeader
-								sx={{ width: '100%', backgroundColor: bgColor, mb: 0.5 }}
-								avatar={
-									<Skeleton
-										animation="pulse"
-										variant="circular"
-										width={50}
-										height={50}
-										sx={{ bgcolor: bgColorSkeleton }}
-									/>
-								}
-								title={
-									<Skeleton
-										animation="pulse"
-										height={15}
-										width="80%"
-										sx={{ bgcolor: bgColorSkeleton, mb: '6px' }}
-									/>
-								}
-								subheader={
-									<Skeleton animation="pulse" height={12} width="50%" sx={{ bgcolor: bgColorSkeleton }} />
-								}
-							/>
-						</>
-					)
-				} */}
-			</Grid>
-		</Grid>
-	);
+  const handleClickFindUser = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseFindUser = () => {
+    setAnchorEl(null);
+  };
+  const open = Boolean(anchorEl);
+
+  const handleSelectedUser = async (user: UserMessage, lastMessage: Message | undefined) => {
+    dispatch(setSelectedUser(user));
+    if (lastMessage?.receiverId === currentUserId && !lastMessage?.isSeen) {
+      try {
+        const data: SeenMessage = {
+          senderId: lastMessage?.senderId,
+          receiverId: lastMessage?.receiverId,
+          id: lastMessage?.id,
+        };
+        await seenMessage(data).unwrap();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      dispatch(setSeenLastMessage(data));
+    }
+  }, [data, dispatch, isSuccess]);
+
+  return (
+    <Grid
+      item
+      xs={5}
+      sm={5}
+      md={4}
+      lg={3}
+      sx={{ borderRight: borderColor, paddingTop: '15px', paddingRight: 1, paddingLeft: 2 }}
+    >
+      <Grid container>
+        <Grid item xs container alignItems="center">
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              fontSize: '1.5rem',
+              color: isDarkmode ? colorMsgDarkmode : blackColor,
+            }}
+          >
+            Chat
+          </Typography>
+        </Grid>
+        <Grid item xs>
+          <Typography
+            variant="h5"
+            textAlign="end"
+            sx={{
+              fontWeight: 'bold',
+              fontSize: '1.5rem',
+              color: '#E4E6EB',
+              marginRight: 1,
+            }}
+          >
+            <IconButton
+              aria-label="Tùy chọn"
+              size="medium"
+              sx={{
+                mr: 1,
+                color: colorText,
+                backgroundColor: bgColor,
+                ':hover': {
+                  backgroundColor: bgColorHover,
+                },
+              }}
+            >
+              <MoreHorizIcon />
+            </IconButton>
+            <IconButton
+              aria-label="Tin nhắn mới"
+              size="medium"
+              sx={{
+                color: colorText,
+                backgroundColor: bgColor,
+                ':hover': {
+                  backgroundColor: bgColorHover,
+                },
+              }}
+              onClick={handleClickFindUser}
+            >
+              <BorderColorIcon />
+            </IconButton>
+          </Typography>
+          <FindUserMsg
+            isOpen={open}
+            anchorEl={anchorEl}
+            handleHiddenPopper={handleCloseFindUser}
+          />
+        </Grid>
+      </Grid>
+      <Grid container sx={{ mt: 2, overflowY: 'auto', maxHeight: '568px' }}>
+        {listConversation.length > 0 &&
+          listConversation.map((conv) => {
+            const user = conv.userId === currentUserId ? conv.friend : conv.user;
+            const friend = conv.friendId === selectedUserId ? conv.friend : conv.user; 
+            return (
+              <MessageListItem
+                key={conv.id}
+                user={user}
+                friend={friend}
+                onClick={handleSelectedUser}
+              />
+            );
+          })}
+        {listConversation.length === 0 && (
+          <>
+            <SkeletonMessage />
+            <SkeletonMessage />
+            <SkeletonMessage />
+            <SkeletonMessage />
+          </>
+        )}
+      </Grid>
+    </Grid>
+  );
 }
 
 export default React.memo(MessageList);

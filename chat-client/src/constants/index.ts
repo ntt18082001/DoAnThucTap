@@ -43,7 +43,7 @@ export const expirationTime = 'exp_time';
 export const LOAD_LOCAL_STORAGE = 'LOAD_LOCAL_STORAGE';
 
 // Default avatar
-export const defaultAvatar = 'dino.png';
+export const defaultAvatar = 'avatar/default_avatar.jpg';
 
 // Slice API
 export const AUTH_API_REDUCER = 'authApi';

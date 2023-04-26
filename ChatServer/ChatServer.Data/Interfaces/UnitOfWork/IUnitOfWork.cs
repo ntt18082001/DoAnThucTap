@@ -12,6 +12,7 @@ namespace ChatServer.Data.Interfaces.UnitOfWork
         ILoginRepository LoginRepository { get; }
         IUserRepository UserRepository { get; }
         IFriendRequestRepository FriendRequestRepository { get; }
+        IMessageRepository MessageRepository { get; }
 		Task SaveAsync();
     }
 }

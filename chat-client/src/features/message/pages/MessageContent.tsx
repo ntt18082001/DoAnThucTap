@@ -2,44 +2,32 @@ import { Grid } from "@mui/material";
 import { useAppSelector } from "app/hooks";
 import { selectIsDarkmode } from "features/darkmode/darkmodeSlice";
 import React, { useEffect } from "react";
-import { borderColorDarkmode, borderColorDefault } from '../../../constants/index';
+import { borderColorDarkmode, borderColorDefault, routeMessage } from '../../../constants/index';
 import Conversation from "./Conversation/Conversation";
 import { useAppDispatch } from '../../../app/hooks';
-import { useParams } from "react-router-dom";
-import { selectSelectedUser, setSelectedUser, selectCurrentUserId, setListMessage } from '../messageSlice';
-import axiosClient from 'api/axiosClient';
+import { useNavigate, useParams } from "react-router-dom";
+import { selectSelectedUser, setSelectedUser } from '../messageSlice';
+import { useGetUserSelectedQuery } from "../message.service";
 
 type Props = {};
 
 const MessageContent = (props: Props) => {
-	console.log("Msg content render");
 	const isDarkmode = useAppSelector(selectIsDarkmode);
+	const navigate = useNavigate();
 
 	const dispatch = useAppDispatch();
-	const currentUserId = useAppSelector(selectCurrentUserId);
-
 	const { id } = useParams();
-	// const user = useAppSelector(state => state.auth.listUserTalked.find(item => item.id.toString() === id));
-
+	const { data, isSuccess } = useGetUserSelectedQuery(id != null ? id : '');
 	const selectedUser = useAppSelector(selectSelectedUser);
-	useEffect(() => {
-		if (!selectedUser) {
-			// dispatch(setSelectedUser(user));
-		}
-	}, [selectedUser, dispatch]);
 
-   useEffect(() => {
-		const getListMessage = async () => {
-			const response = await axiosClient.get(`/message/getlistmessage?senderId=${currentUserId}&receiverId=${selectedUser?.id}`)
-				.then(res => {
-					return res.data;
-				});
-				console.log(response);
-			dispatch(setListMessage(response));
+	useEffect(() => {
+		if(isSuccess && data == null) {
+			navigate(routeMessage);
 		}
-		getListMessage();
-		
-   }, [currentUserId, dispatch, selectedUser?.id]);
+		if (!selectedUser && data && isSuccess) {
+			dispatch(setSelectedUser(data));
+		}
+	}, [selectedUser, dispatch, id, data, isSuccess, navigate]);
 
 	const borderColor = isDarkmode ? borderColorDarkmode : borderColorDefault;
 

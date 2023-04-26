@@ -4,46 +4,48 @@ import { ChatHubContext } from 'features/hubs/ChatHubContext';
 import React, { useContext, useEffect } from 'react';
 
 import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { Message } from '../../../../models/messages.model';
-import { selectConversations, selectCurrentUserId, selectSelectedUser, setListMessage, setMessageConversation } from '../../messageSlice';
+import { Message, SendMessage } from '../../../../models/messages.model';
+import { selectSelectedUser, setMessage } from '../../messageSlice';
 import ConversationContent from './ConversationContent';
 import ConversationFormMessage from './ConversationFormMessage';
 import ConversationTitle from './ConversationTitle';
 import axiosClient from 'api/axiosClient';
+import { selectUserId } from 'features/auth/authSlice';
+import { useSeenMessageMutation, useSendMessageMutation } from 'features/message/message.service';
 
 
 type Props = {};
 
 const Conversation = (props: Props) => {
-	console.log("Conversation render");
-	const hubConnection = useContext<HubConnection>(ChatHubContext);
-
 	const dispatch = useAppDispatch();
-
+	const currendUserId = useAppSelector(selectUserId);
 	const selectedUser = useAppSelector(selectSelectedUser);
-	const currentUserId = useAppSelector(selectCurrentUserId);
-	const conversations = useAppSelector(selectConversations);
-	let conversationsOfSelectedUser: Message[] = [];
+	const selectConversation = useAppSelector(state => state.message.conversations
+		.find(item => (item.userId === currendUserId && item.friendId === selectedUser?.id) || (item.userId === selectedUser?.id && item.friendId === currendUserId)));
 
-	if (selectedUser) {
-		conversationsOfSelectedUser = conversations[selectedUser.id];
-		if (!conversationsOfSelectedUser) {
-			dispatch(setMessageConversation(null));
-		}
-	}
+	const [sendMessage, { data, isSuccess }] = useSendMessageMutation();
 	
-	const handleSubmitMessage = (message: string) => {
-		if (message.trim().length === 0) {
-			return;
+	const handleSubmitMessage = async (message: string) => {
+		try {
+			if(message === '') {
+				return;
+			}
+			const data: SendMessage = {
+				userId: currendUserId,
+				friendId: selectedUser?.id,
+				content: message
+			}
+			await sendMessage(data).unwrap();
+		} catch(error) {
+			console.log(error);
 		}
-		hubConnection.send("SendMessage", currentUserId, selectedUser?.id.toString(), message);
 	}
 
 	useEffect(() => {
-		hubConnection.on("ReceiveMessage", message => {
-			dispatch(setMessageConversation(message));
-		});
-	}, [currentUserId, dispatch, hubConnection, selectedUser?.id]);
+		if(isSuccess && data) {
+			dispatch(setMessage(data));
+		}
+	}, [data, dispatch, isSuccess]);
 
 	return (
 		<>
@@ -58,7 +60,7 @@ const Conversation = (props: Props) => {
 					user={selectedUser}
 				/>
 				<ConversationContent
-					conversations={conversationsOfSelectedUser}
+					conversations={selectConversation}
 				/>
 				<ConversationFormMessage onSubmit={handleSubmitMessage} />
 			</Grid>

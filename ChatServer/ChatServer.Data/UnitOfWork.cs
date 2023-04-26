@@ -14,17 +14,20 @@ namespace ChatServer.Data
 		public ILoginRepository LoginRepository { get; private set; }
 		public IUserRepository UserRepository { get; private set; }
 		public IFriendRequestRepository FriendRequestRepository { get; private set; }
+		public IMessageRepository MessageRepository { get; private set; }
 
 		public UnitOfWork(
 			AppChatDbContext context,
 			ILoginRepository loginRepository,
 			IUserRepository userRepository,
-			IFriendRequestRepository friendRequestRepository)
+			IFriendRequestRepository friendRequestRepository,
+			IMessageRepository messageRepository)
 		{
 			_context = context;
 			LoginRepository = loginRepository;
 			UserRepository = userRepository;
 			FriendRequestRepository = friendRequestRepository;
+			MessageRepository = messageRepository;
 		}
 
 		public async Task SaveAsync()

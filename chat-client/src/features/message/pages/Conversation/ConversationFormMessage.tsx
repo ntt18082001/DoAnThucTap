@@ -20,7 +20,7 @@ const ConversationFormMessage = (props: Props) => {
 	return (
 		<Grid
 			item
-			sx={{ borderTop: borderColor, maxHeight: '40px', height: '40px' }}
+			sx={{ borderTop: borderColor, maxHeight: '51px', height: '51px' }}
 			display="flex"
 			alignItems="flex-end"
 		>
@@ -30,24 +30,24 @@ const ConversationFormMessage = (props: Props) => {
 					display: 'flex',
 					alignItems: 'center',
 					bgcolor: 'transparent',
-					width: '100%'
+					width: '100%',
+					height: '100%'
 				}}
 				onSubmit={(ev: React.FormEvent<HTMLFormElement>) => { 
 					ev.preventDefault();
-
 					props.onSubmit(message);
 					setMessage('');
 				}}
 			>
 				<CssInputBase
-					sx={{ pl: 2, width: '95%', borderRight: borderColor }}
+					sx={{ pl: 2, width: '100%', height: '100%', borderRight: borderColor }}
 					placeholder="Aa"
 					maxRows={3}
-					onChange={ ev => setMessage(ev.currentTarget.value) }
+					onChange={(ev) => setMessage(ev.currentTarget.value) }
 					value={message}
 				/>
 				<IconButton
-					sx={{ pl: '15px' }}
+					sx={{ p: '15px' }}
 					color="secondary"
 					type='submit'
 				>

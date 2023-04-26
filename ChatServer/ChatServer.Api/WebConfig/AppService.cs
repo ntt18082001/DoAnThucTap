@@ -103,10 +103,12 @@ namespace ChatServer.Api.WebConfig
 			services.AddTransient<ILoginRepository, LoginRepository>();
 			services.AddTransient<IUserRepository, UserRepository>();
 			services.AddTransient<IFriendRequestRepository, FriendRequestRepository>();
+			services.AddTransient<IMessageRepository, MessageRepository>();
 			// Add services
 			services.AddTransient<LoginService>();
 			services.AddTransient<UserService>();
 			services.AddTransient<FriendRequestService>();
+			services.AddTransient<MessageService>();
 
 			// Add file storage
 			services.AddScoped<IFileStorageService, FileStorageService>();

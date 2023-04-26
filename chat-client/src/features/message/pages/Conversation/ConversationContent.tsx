@@ -2,17 +2,17 @@ import { Box, Grid, Typography } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 
 import { useAppSelector } from '../../../../app/hooks';
-import { Message } from '../../../../models/messages.model';
-import { selectCurrentUserId } from '../../messageSlice';
+import { ConversationModel } from '../../../../models/messages.model';
 import ConversationMessage from './ConversationMessage';
+import { selectUserId } from 'features/auth/authSlice';
 
 interface Props {
-	conversations?: Message[];
+	conversations?: ConversationModel;
 };
 
 const ConversationContent = (props: Props) => {
 	const messageEndRef = useRef<HTMLDivElement>(null);
-	const currentUserId = useAppSelector(selectCurrentUserId);
+	const currentUserId = useAppSelector(selectUserId);
 
 	useEffect(() => {
 		if (messageEndRef.current) {
@@ -28,14 +28,15 @@ const ConversationContent = (props: Props) => {
 			sx={{
 				height: '743px',
 				color: "#E4E6EB",
+				paddingTop: '12px'
 			}}
 		>
 			<Box sx={{ pl: 1, pb: 2, maxHeight: '100%', width: '100%', overflowY: 'auto' }}>
-				{props.conversations?.map((conv, index) => {
+				{props.conversations?.conversation.map((conv, index) => {
 					let isAvatar = false;
 
 					if (props.conversations) {
-						if (props.conversations[index]?.receiverId !== props.conversations[index + 1]?.receiverId) {
+						if (props.conversations.conversation[index]?.receiverId !== props.conversations.conversation[index + 1]?.receiverId) {
 							isAvatar = true;
 						}
 					}
@@ -43,10 +44,9 @@ const ConversationContent = (props: Props) => {
 					return (
 						<ConversationMessage
 							key={conv.id}
-							me={conv.senderId.toString() === currentUserId}
-							message={conv.message}
+							me={conv.senderId === currentUserId}
+							message={conv}
 							isAvatar={isAvatar}
-                     sendingTime={conv.sendingTime}
 						/>
 					)
 				})}

@@ -1,7 +1,7 @@
 import ApiIcon from '@mui/icons-material/Api';
 import { Backdrop, Container, LinearProgress } from '@mui/material';
 import React, { Suspense, useContext, useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 
 import { bodyBgColorBlack, bodyBgColorDefault } from '../../constants';
 import { Header } from '../Common/Header';
@@ -10,12 +10,24 @@ import { selectIsDarkmode } from 'features/darkmode/darkmodeSlice';
 import { HubConnection } from '@microsoft/signalr';
 import { ChatHubContext } from 'features/hubs/ChatHubContext';
 import { useGetListNotifyQuery } from 'features/notify/notify.service';
-import { selectIsLoggedIn } from 'features/auth/authSlice';
+import { selectIsLoggedIn, selectUserId } from 'features/auth/authSlice';
 import { NotifyCancel, NotifyModel } from 'models/notify.model';
 import { cancelNotifyFromSender, setListNotify, setNotify } from 'features/notify/notifySlice';
 import { toast } from 'react-toastify';
-import { setAcceptRequest, setCancelReceiverRequest, setCancelRequest, setReceiverRequest, setUnfriend } from 'features/friends/friendSlice';
+import {
+  setAcceptRequest,
+  setCancelReceiverRequest,
+  setCancelRequest,
+  setReceiverRequest,
+  setUnfriend,
+} from 'features/friends/friendSlice';
 import { Unfriend } from 'models/friend.model';
+import { setConversations, setDeleteMessage, setMessage, setSeenLastMessage, toggleLikeMessage } from 'features/message/messageSlice';
+import { ConversationModel, Message, SeenMessage } from 'models/messages.model';
+import {
+  useGetListConversationQuery,
+  useSeenMessageMutation,
+} from 'features/message/message.service';
 
 interface MainLayoutProps {}
 
@@ -27,12 +39,23 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
   const hubConnection = useContext<HubConnection>(ChatHubContext);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const { data, isSuccess, refetch } = useGetListNotifyQuery();
+  const resultGetListConversation = useGetListConversationQuery();
+
+  const { id } = useParams();
+  const currentUserId = useAppSelector(selectUserId);
+  const [seenMessage, seenMessageResult] = useSeenMessageMutation();
 
   useEffect(() => {
-    if(isLoggedIn) {
+    if (isLoggedIn) {
       refetch();
     }
   }, [isLoggedIn, refetch]);
+
+  useEffect(() => {
+    if (resultGetListConversation.isSuccess && resultGetListConversation.data) {
+      dispatch(setConversations(resultGetListConversation.data));
+    }
+  }, [resultGetListConversation, dispatch]);
 
   useEffect(() => {
     if (isSuccess && data) {
@@ -47,10 +70,10 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
       });
     }
     return () => {
-      if(hubConnection) {
-        hubConnection.off("CancelRequestFromReceiver");
+      if (hubConnection) {
+        hubConnection.off('CancelRequestFromReceiver');
       }
-    }
+    };
   }, [dispatch, hubConnection]);
 
   useEffect(() => {
@@ -61,10 +84,10 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
       });
     }
     return () => {
-      if(hubConnection) {
-        hubConnection.off("CancelRequestFromSender");
+      if (hubConnection) {
+        hubConnection.off('CancelRequestFromSender');
       }
-    }
+    };
   }, [dispatch, hubConnection]);
 
   useEffect(() => {
@@ -72,14 +95,14 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
       hubConnection.on('ReceiveFriendRequest', (data: NotifyModel) => {
         dispatch(setNotify(data));
         dispatch(setReceiverRequest(data.senderId));
-        toast.info("Bạn có lời mời kết bạn mới!");
+        toast.info('Bạn có lời mời kết bạn mới!');
       });
     }
     return () => {
-      if(hubConnection) {
-        hubConnection.off("ReceiveFriendRequest");
+      if (hubConnection) {
+        hubConnection.off('ReceiveFriendRequest');
       }
-    }
+    };
   }, [dispatch, hubConnection]);
 
   useEffect(() => {
@@ -91,10 +114,10 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
       });
     }
     return () => {
-      if(hubConnection) {
-        hubConnection.off("AcceptRequest");
+      if (hubConnection) {
+        hubConnection.off('AcceptRequest');
       }
-    }
+    };
   }, [dispatch, hubConnection]);
 
   useEffect(() => {
@@ -104,11 +127,84 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
       });
     }
     return () => {
-      if(hubConnection) {
-        hubConnection.off("Unfriend");
+      if (hubConnection) {
+        hubConnection.off('Unfriend');
       }
-    }
+    };
   }, [dispatch, hubConnection]);
+
+  useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('ReceiveMessage', (data: ConversationModel) => {
+        dispatch(setMessage(data));
+        if (id && currentUserId && id == data.lastMessage.senderId) {
+          const handleSeenMessageInCurrentParams = async (message: Message) => {
+            try {
+              const seenMsg: SeenMessage = {
+                senderId: message.senderId,
+                receiverId: message.receiverId,
+                id: message.id,
+              };
+              await seenMessage(seenMsg).unwrap();
+            } catch (error) {
+              console.log(error);
+            }
+          };
+          handleSeenMessageInCurrentParams(data.lastMessage);
+        }
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('ReceiveMessage');
+      }
+    };
+  }, [currentUserId, dispatch, hubConnection, id, seenMessage]);
+
+  useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('ReceiveSeenMessage', (data: string) => {
+        dispatch(setSeenLastMessage(data));
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('ReceiveSeenMessage');
+      }
+    };
+  }, [dispatch, hubConnection]);
+
+  useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('ToggleLikeMessage', (data: string) => {
+        dispatch(toggleLikeMessage(data));
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('ToggleLikeMessage');
+      }
+    };
+  }, [dispatch, hubConnection]);
+
+  useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('DeleteMessage', (data: string) => {
+        dispatch(setDeleteMessage(data));
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('DeleteMessage');
+      }
+    };
+  }, [dispatch, hubConnection]);
+
+  useEffect(() => {
+    if (seenMessageResult.isSuccess && seenMessageResult.data) {
+      dispatch(setSeenLastMessage(seenMessageResult.data));
+    }
+  }, [dispatch, seenMessageResult.data, seenMessageResult.isSuccess]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -133,11 +229,11 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
           <Container
             maxWidth="xl"
             sx={{
-              height: 'calc(100vh - 73px)',
+              height: 'calc(100vh - 65px)',
               pl: '0px !important',
               pr: '0px !important',
               maxWidth: '100% !important',
-              overflow: 'scroll',
+              overflow: 'hidden',
             }}
             className={darkmode ? 'darkmode-bg-color' : ''}
           >

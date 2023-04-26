@@ -4,6 +4,7 @@ using ChatServer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatServer.Data.Migrations
 {
     [DbContext(typeof(AppChatDbContext))]
-    partial class AppChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230425103100_add_col_IsSeen_tbl_AppMessage")]
+    partial class add_col_IsSeen_tbl_AppMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

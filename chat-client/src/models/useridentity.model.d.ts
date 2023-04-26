@@ -19,9 +19,6 @@ export interface UserModel {
 	email: string;
 	avatar: string;
 	fullName: string;
-	nickname: string;
-	lastMesg?: Message;
-	role?: string;
 	address?: string;
 	phoneNumber?: string;
 }

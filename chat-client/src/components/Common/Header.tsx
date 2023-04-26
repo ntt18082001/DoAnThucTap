@@ -41,6 +41,7 @@ import { GroupAdd, Logout } from '@mui/icons-material';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotifyList from 'features/notify/pages/NotifyList';
 import { selectLengthNotify } from 'features/notify/notifySlice';
+import { selectCountLastMessageNotSeen } from 'features/message/messageSlice';
 
 interface HeaderProps {}
 
@@ -98,6 +99,7 @@ export function Header(props: HeaderProps) {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const user = useAppSelector(selectUser);
   const notifyLength = useAppSelector(selectLengthNotify);
+  const notifyMessage = useAppSelector(selectCountLastMessageNotSeen);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [menuNotify, setMenuNotify] = React.useState<null | HTMLElement>(null);
@@ -139,9 +141,9 @@ export function Header(props: HeaderProps) {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, height: '73px' }}>
+    <Box sx={{ flexGrow: 1, height: '65px' }}>
       <AppBar position="static" sx={darkBackground()}>
-        <Toolbar sx={{ height: '72px' }}>
+        <Toolbar sx={{ height: '65px' }}>
           <Typography variant="h5" component="div" sx={{ flexGrow: 1 }}>
             <NavLink to="/" style={{ color: isDarkmode ? mainColor : blackColor }}>
               TS-CHAT
@@ -168,7 +170,7 @@ export function Header(props: HeaderProps) {
                 <IconButton aria-label="Message" size="large">
                   <Tooltip TransitionComponent={Zoom} title="Tin nhắn">
                     <NavLink to={routeMessage} style={{ color: darkBackground().color }}>
-                      <Badge badgeContent={0} showZero color="error" sx={{ marginRight: '10px' }}>
+                      <Badge badgeContent={notifyMessage} showZero color="error" sx={{ marginRight: '10px' }}>
                         <MapsUgcIcon />
                       </Badge>
                     </NavLink>

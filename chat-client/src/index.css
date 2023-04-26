@@ -61,5 +61,9 @@ a.active {
 
 .me {
   flex-direction: row-reverse;
-  margin-right: 20px;
+  margin-right: 10px;
+}
+
+.css-qkoq4h-MuiGrid-root > .MuiGrid-item {
+  overflow: hidden;
 }

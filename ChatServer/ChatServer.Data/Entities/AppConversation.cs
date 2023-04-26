@@ -13,8 +13,8 @@ namespace ChatServer.Data.Entities
 		{
 			Messages = new HashSet<AppMessage>();
 		}
-		public int UserId1 { get; set; }
-		public int UserId2 { get; set; }
+		public int UserId1 { get; set; } // UserId
+		public int UserId2 { get; set; } // FriendId
 		public DateTime StartTime { get; set; }
 		public DateTime? EndTime { get; set; }
 		public AppUser AppUser1 { get; set; }
