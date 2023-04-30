@@ -25,9 +25,9 @@ namespace ChatServer.Data.Services
 		{
 			return await _unitOfWork.MessageRepository.GetUserSelected(id);
 		}
-		public async Task<bool> CheckConversation(int userId, int friendId)
+		public async Task<AppConversation> GetConversation(int userId, int friendId)
 		{
-			return await _unitOfWork.MessageRepository.CheckExistConversation(userId, friendId);
+			return await _unitOfWork.MessageRepository.GetConversation(userId, friendId);
 		}
 		public async Task<ConversationDTO> SendMessage(SendMessageDTO model)
 		{
@@ -50,5 +50,13 @@ namespace ChatServer.Data.Services
 			}
 			return false;
 		} 
+		public async Task<GetMoreMessageDTO> GetMoreMessage(int idConv, int idLastMsg, int lengthListMsg)
+		{
+			return await _unitOfWork.MessageRepository.GetMoreMessage(idConv, idLastMsg, lengthListMsg);
+		}
+		public async Task<ListImageMessageDTO> GetListMessageImage(int id, int? idLastMsg, int lengthData = 0)
+		{
+			return await _unitOfWork.MessageRepository.GetListImgMessage(id, idLastMsg, lengthData);
+		}
 	}
 }

@@ -21,7 +21,7 @@ function FriendLayout() {
     <>
       <Container
         className={darkmode ? 'darkmode-bg-color' : ''}
-        sx={{ pt: 4 }}
+        sx={{ pt: 4, pb: 4 }}
       >
         <Suspense fallback={<LinearProgress color="secondary" />}>
           <Outlet />

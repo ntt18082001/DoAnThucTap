@@ -33,6 +33,7 @@ namespace ChatServer.Data.Entities
 		public int? BlockedBy { get; set; }
 		public bool IsOnline { get; set; }
 		public int? AppRoleId { get; set; }
+		public string? MessageKey { get; set; }
 		public AppRole AppRole { get; set; }
 		public ICollection<AppConversation> ConversationsOfUser1 { get; set; }
 		public ICollection<AppConversation> ConversationsOfUser2 { get; set; }

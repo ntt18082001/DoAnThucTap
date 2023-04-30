@@ -2,60 +2,103 @@ import SendIcon from '@mui/icons-material/Send';
 import { Grid, IconButton, Paper } from '@mui/material';
 import { useAppSelector } from 'app/hooks';
 import { selectIsDarkmode } from 'features/darkmode/darkmodeSlice';
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { borderColorDarkmode, borderColorDefault } from '../../../../constants';
 import { CssInputBase } from '../../../../utils/CssTextField';
-
+import { PhotoCamera } from '@mui/icons-material';
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
+import emoji from 'emoji-js';
 
 interface Props {
-	onSubmit: (message: string) => void;
-};
+  onSubmit: (message: string, file?: File) => void;
+}
 
 const ConversationFormMessage = (props: Props) => {
-	const isDarkmode = useAppSelector(selectIsDarkmode);
-	const [message, setMessage] = useState<string>('');
+  const isDarkmode = useAppSelector(selectIsDarkmode);
+  const [message, setMessage] = useState<string>('');
+  const [isShowEmojiPicker, setIsShowEmojiPicker] = useState(false);
 
-	const borderColor = isDarkmode ? borderColorDarkmode : borderColorDefault;
+  const borderColor = isDarkmode ? borderColorDarkmode : borderColorDefault;
 
-	return (
-		<Grid
-			item
-			sx={{ borderTop: borderColor, maxHeight: '51px', height: '51px' }}
-			display="flex"
-			alignItems="flex-end"
-		>
-			<Paper
-				component='form'
-				sx={{
-					display: 'flex',
-					alignItems: 'center',
-					bgcolor: 'transparent',
-					width: '100%',
-					height: '100%'
-				}}
-				onSubmit={(ev: React.FormEvent<HTMLFormElement>) => { 
-					ev.preventDefault();
-					props.onSubmit(message);
-					setMessage('');
-				}}
-			>
-				<CssInputBase
-					sx={{ pl: 2, width: '100%', height: '100%', borderRight: borderColor }}
-					placeholder="Aa"
-					maxRows={3}
-					onChange={(ev) => setMessage(ev.currentTarget.value) }
-					value={message}
-				/>
-				<IconButton
-					sx={{ p: '15px' }}
-					color="secondary"
-					type='submit'
-				>
-					<SendIcon />
-				</IconButton>
-			</Paper>
-		</Grid>
-	);
+  const toggleShowPicker = () => {
+    setIsShowEmojiPicker(!isShowEmojiPicker);
+  };
+
+  const onClickSelectEmoji = (emojiData: EmojiClickData, event: MouseEvent) => {
+    setMessage(message + emojiData.emoji);
+  };
+
+  const handleChangeFile = (ev: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = ev.target.files?.[0];
+    if (selectedFile) {
+      props.onSubmit(message, selectedFile);
+    }
+  };
+
+  return (
+    <Grid
+      item
+      sx={{ borderTop: borderColor, maxHeight: '51px', height: '51px' }}
+      display="flex"
+      alignItems="flex-end"
+    >
+      <Paper
+        component="form"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          bgcolor: 'transparent',
+          width: '100%',
+          height: '100%',
+        }}
+        onSubmit={(ev) => {
+          ev.preventDefault();
+          props.onSubmit(message.trimStart());
+          setMessage('');
+        }}
+      >
+        <IconButton sx={{ p: '15px' }} color="secondary" component="label">
+          <input hidden accept="image/*" multiple type="file" onChange={handleChangeFile} />
+          <PhotoCamera />
+        </IconButton>
+        <CssInputBase
+          sx={{
+            pl: 2,
+            width: '100%',
+            height: '100%',
+            borderRight: borderColor,
+            borderLeft: borderColor,
+          }}
+          placeholder="Aa"
+          multiline
+          maxRows={3}
+          onChange={(ev) => {
+            const text = ev.target.value;
+            const emojiInstance = new emoji.EmojiConvertor();
+            // Tìm kiếm và thay thế các ký tự đặc biệt bằng emoji tương ứng
+            const newText = emojiInstance.replace_colons(text);
+            setMessage(newText);
+          }}
+          onKeyDown={(ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if (ev.key === 'Enter' && !ev.shiftKey) {
+              ev.preventDefault();
+              props.onSubmit(message.trimStart());
+              setMessage('');
+            }
+          }}
+          value={message}
+        />
+        {isShowEmojiPicker && <EmojiPicker onEmojiClick={onClickSelectEmoji} lazyLoadEmojis />}
+        <IconButton sx={{ p: '15px' }} color="warning" onClick={toggleShowPicker}>
+          <EmojiEmotionsIcon />
+        </IconButton>
+        <IconButton sx={{ p: '15px' }} color="secondary" type="submit">
+          <SendIcon />
+        </IconButton>
+      </Paper>
+    </Grid>
+  );
 };
 
 export default ConversationFormMessage;

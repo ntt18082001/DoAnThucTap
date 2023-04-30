@@ -62,5 +62,25 @@ namespace ChatServer.Data.Services
 		{
 			return await _unitOfWork.UserRepository.GetListFriend(id);
 		}
+		public async Task SetUserOnline(int id)
+		{
+			var isSuccess = await _unitOfWork.UserRepository.SetUserOnline(id);
+			if(isSuccess)
+			{
+				await _unitOfWork.SaveAsync();
+			}
+		}
+		public async Task SetUserOffline(int id)
+		{
+			var isSuccess = await _unitOfWork.UserRepository.SetUserOffline(id);
+			if (isSuccess)
+			{
+				await _unitOfWork.SaveAsync();
+			}
+		}
+		public async Task<List<string>> GetListFriendOnline(int id)
+		{
+			return await _unitOfWork.UserRepository.GetListFriendOnline(id);
+		}
 	}
 }

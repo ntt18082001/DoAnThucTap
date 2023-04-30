@@ -63,6 +63,7 @@ namespace ChatServer.Api.Controllers
 				user.Username = registerDTO.Email;
 				user.AppRoleId = RoleConst.UserRole.ID;
 				user.Avatar = DEFAULT_FOLDER_AVATAR + "/" + DEFAULT_AVATAR;
+				user.MessageKey = StringHasher.CreateSalt();
 				var isSuccess = await _userService.Register(user);
 				return Ok(isSuccess);
 			}

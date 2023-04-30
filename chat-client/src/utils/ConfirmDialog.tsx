@@ -11,29 +11,26 @@ export interface ConfirmationDialogRawProps {
 }
 
 function ConfirmDialog(props: ConfirmationDialogRawProps) {
-  const { onClose, open, ...other } = props;
+  const { onClose, open, handleSubmit, ...other } = props;
   const handleCancel = () => {
     onClose();
   };
 
-  const handleOk = () => {
-    props.handleSubmit();
-    onClose();
-  };
-
   return (
-    <Dialog
-      sx={{ '& .MuiDialog-paper': { maxHeight: 435 } }}
-      maxWidth="xs"
-      open={open}
-      {...other}
-    >
+    <Dialog sx={{ '& .MuiDialog-paper': { maxHeight: 435 } }} maxWidth="xs" open={open} {...other}>
       {props.children}
       <DialogActions>
         <Button autoFocus onClick={handleCancel}>
           Hủy
         </Button>
-        <Button onClick={handleOk}>Xóa</Button>
+        <Button
+          onClick={() => {
+            handleSubmit();
+            onClose();
+          }}
+        >
+          Xóa
+        </Button>
       </DialogActions>
     </Dialog>
   );

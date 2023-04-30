@@ -26,6 +26,10 @@ function OptionsMenu(props: MenuProps) {
     setOpenDialog(false);
   };
 
+  const handleDeleteMessage = () => {
+    props.handleDeleteMessage();
+  }
+
   return (
     <>
       <Menu
@@ -71,7 +75,7 @@ function OptionsMenu(props: MenuProps) {
           Xóa
         </MenuItem>
       </Menu>
-      <ConfirmDialog id="confirm-menu" keepMounted open={openDialog} onClose={handleCloseDialog} handleSubmit={props.handleDeleteMessage}>
+      <ConfirmDialog id="confirm-menu" keepMounted open={openDialog} onClose={handleCloseDialog} handleSubmit={handleDeleteMessage}>
         <Fragment>
           <DialogTitle sx={{ textAlign: 'center' }}>Xác nhận xóa tin nhắn?</DialogTitle>
         </Fragment>

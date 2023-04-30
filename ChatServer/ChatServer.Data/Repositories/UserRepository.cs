@@ -86,7 +86,7 @@ namespace ChatServer.Data.Repositories
 			var friends = await GetListFriendId(id);
 			var result = new List<FriendDTO>();
 			var listUser = await dbSet
-					.Where(x => x.Id != id && friends.Contains(x.Id))
+					.Where(x => x.Id != id && friends.Contains(x.Id) && x.DeletedDate == null)
 					.OrderByDescending(x => x.Id)
 					.ToListAsync();
 			foreach (var item in listUser)
@@ -102,6 +102,37 @@ namespace ChatServer.Data.Repositories
 				});
 			}
 			return result;
+		}
+
+		public async Task<bool> SetUserOnline(int id)
+		{
+			var user = await dbSet.FindAsync(id);
+			if(user != null)
+			{
+				user.IsOnline = true;
+				return true;
+			}
+			return false;
+		}
+
+		public async Task<bool> SetUserOffline(int id)
+		{
+			var user = await dbSet.FindAsync(id);
+			if (user != null)
+			{
+				user.IsOnline = false;
+				return true;
+			}
+			return false;
+		}
+
+		public async Task<List<string>> GetListFriendOnline(int id)
+		{
+			var friends = await GetListFriendId(id);
+			return await dbSet
+					.Where(x => x.Id != id && x.IsOnline == true && x.DeletedDate == null && friends.Contains(x.Id))
+					.Select(x => x.Id.ToString())
+					.ToListAsync();
 		}
 	}
 }

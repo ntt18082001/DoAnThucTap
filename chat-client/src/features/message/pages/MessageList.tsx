@@ -11,7 +11,7 @@ import {
   mainColor,
 } from '../../../constants';
 import { selectIsDarkmode } from '../../darkmode/darkmodeSlice';
-import { selectConversations, selectSelectedUserId, setSeenLastMessage, setSelectedUser } from '../messageSlice';
+import { selectConversations, setSeenLastMessage, setSelectedUser } from '../messageSlice';
 import MessageListItem from './MessageListItem';
 import SkeletonMessage from './SkeletonMessage';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
@@ -27,7 +27,6 @@ function MessageList(props: Props) {
   const dispatch = useAppDispatch();
 
   const currentUserId = useAppSelector(selectUserId);
-  const selectedUserId = useAppSelector(selectSelectedUserId);
   const listConversation = useAppSelector(selectConversations);
 
   const isDarkmode = useAppSelector(selectIsDarkmode);
@@ -78,6 +77,7 @@ function MessageList(props: Props) {
       sm={5}
       md={4}
       lg={3}
+      xl={2}
       sx={{ borderRight: borderColor, paddingTop: '15px', paddingRight: 1, paddingLeft: 2 }}
     >
       <Grid container>
@@ -144,7 +144,7 @@ function MessageList(props: Props) {
         {listConversation.length > 0 &&
           listConversation.map((conv) => {
             const user = conv.userId === currentUserId ? conv.friend : conv.user;
-            const friend = conv.friendId === selectedUserId ? conv.friend : conv.user; 
+            const friend = conv.friendId === conv.lastMessage.senderId ? conv.friend : conv.user; 
             return (
               <MessageListItem
                 key={conv.id}

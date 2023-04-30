@@ -13,11 +13,14 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { selectIsDarkmode } from 'features/darkmode/darkmodeSlice';
 import OptionsMenu from './OptionsMenu';
+import 'photoswipe/dist/photoswipe.css'
+import ImageItem from './Components/ImageItem';
 
 type Props = {
   message: Message;
   me: boolean;
   isAvatar: boolean;
+  lastSeen?: string;
 };
 
 const ConversationMessage = (props: Props) => {
@@ -29,9 +32,11 @@ const ConversationMessage = (props: Props) => {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -50,6 +55,12 @@ const ConversationMessage = (props: Props) => {
   }
 
   const dateString = new Date(props.message.sentTime).toLocaleString();
+  const content = props.message.content
+    ? props.message.content.replace(
+        /(https?:\/\/[^\s]+)/g,
+        '<a class="url-msg" target="_blank" href="$1">$1</a>'
+      )
+    : null;
 
   const handleToggleLikeMessage = async () => {
     try {
@@ -84,36 +95,53 @@ const ConversationMessage = (props: Props) => {
       className={props.me ? 'me' : ''}
       sx={{ pl: props.isAvatar ? 1 : 5 }}
     >
+      {props.me && props.lastSeen && props.lastSeen === props.message.id && (
+        <Avatar
+          alt={selectedUser?.name}
+          src={`${baseURL}/${selectedUser?.avatar}`}
+          sx={{ width: '16px', height: '16px', transition: '1s ease-in-out' }}
+        />
+      )}
       {avatar}
       {!props.message.isDelete && (
         <Tooltip title={dateString} placement="right">
           <Box
             sx={{
               maxWidth: '50%',
-              mt: '2px',
+              mt: '5px',
               display: 'flex',
               gap: '5px',
+              mr: props.me && props.lastSeen === props.message.id ? '' : '28px',
             }}
             className={props.me ? 'me' : ''}
           >
-            <Typography
-              variant="body2"
-              sx={{
-                maxWidth: '100%',
-                backgroundColor: 'purple',
-                borderRadius: 3,
-                p: '8px 15px',
-                width: 'fit-content',
-                wordBreak: 'break-all',
-                wordWrap: 'break-word',
-              }}
-            >
-              {props.message.content}
-            </Typography>
+            {content && (
+              <Typography
+                variant="body2"
+                sx={{
+                  maxWidth: '100%',
+                  backgroundColor: 'purple',
+                  borderRadius: 3,
+                  p: '8px 15px',
+                  width: 'fit-content',
+                  wordBreak: 'break-all',
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                }}
+                dangerouslySetInnerHTML={{ __html: content }}
+              />
+            )}
+            {props.message.urlImage && (
+              <ImageItem alt={props.message.urlImage} src={props.message.urlImage} />
+            )}
             <IconButton
               aria-label="Like"
               size="small"
-              sx={{ color: props.message.isLiked ? '#2196f3' : grey[500] }}
+              sx={{
+                color: props.message.isLiked ? '#2196f3' : grey[500],
+                height: 'fit-content',
+                m: 'auto',
+              }}
               onClick={handleToggleLikeMessage}
             >
               <Tooltip title="Thích">
@@ -131,6 +159,8 @@ const ConversationMessage = (props: Props) => {
                     ':hover': {
                       backgroundColor: bgColorHover,
                     },
+                    height: 'fit-content',
+                    m: 'auto',
                   }}
                   onClick={handleClick}
                   aria-controls={open ? 'options-menu' : undefined}

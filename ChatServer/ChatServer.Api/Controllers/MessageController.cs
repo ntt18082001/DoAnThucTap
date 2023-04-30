@@ -73,7 +73,7 @@ namespace ChatServer.Api.Controllers
 			}
 		}
 		[HttpPost("SendMessage")]
-		public async Task<IActionResult> SendMessage([FromBody] SendMessageDTO model)
+		public async Task<IActionResult> SendMessage([FromForm] SendMessageDTO model)
 		{
 			try
 			{
@@ -172,6 +172,33 @@ namespace ChatServer.Api.Controllers
 				}
 			}
 			catch (Exception ex)
+			{
+				return BadRequest(ERROR_NAME);
+			}
+		}
+		[HttpPut("GetMoreMessage")]
+		public async Task<IActionResult> GetMoreMessage([FromBody] GetMoreMessage model)
+		{
+			try
+			{
+				var listMoreMsg = await _messageService
+					.GetMoreMessage(model.ConversationId, model.LastMessageId, model.LengthMessages);
+				return Ok(listMoreMsg);
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ERROR_NAME);
+			}
+		}
+		[HttpPost("GetListMessageImage")]
+		public async Task<IActionResult> GetListMessageImage([FromBody] GetListImg model)
+		{
+			try
+			{
+				var listImg = await _messageService.GetListMessageImage(model.Id, model.IdLastMsg, model.LengthMessagesImg);
+				return Ok(listImg);
+			}
+			catch(Exception ex)
 			{
 				return BadRequest(ERROR_NAME);
 			}

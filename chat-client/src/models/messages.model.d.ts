@@ -2,11 +2,14 @@ export interface UserMessage {
 	id: string;
 	name: string;
 	avatar: string;
+	isOnline?: boolean;
 }
 
 export interface DataMessage {
 	selectedUser?: UserMessage;
 	conversations: ConversationModel[];
+	listFindUser: UserMessage[];
+	isScrollMsg: boolean;
 }
 
 export interface ConversationModel {
@@ -28,7 +31,7 @@ export interface Message {
 	receiverId?: string;
 	isSeen?: boolean;
   sentTime: Date;
-	urlMessage?: string;
+	urlImage?: string;
 	isLiked?: boolean;
 	isDelete?: boolean;
 }
@@ -37,10 +40,37 @@ export interface SendMessage {
 	userId?: string;
 	friendId?: string;
 	content: string;
+	file?: File;
 }
 
 export interface SeenMessage {
 	senderId?: string;
 	receiverId?: string;
 	id?: string;
+}
+
+export interface GetMoreMessage {
+	conversationId: string;
+	lastMessageId: string;
+	lengthMessages: string;
+}
+
+export interface GetMoreMessageResponse {
+	conversationId: string;
+	lastMessageId: string;
+	canGetMore: boolean;
+	messages: Message[];
+}
+
+export interface GetListImg {
+	id?: string; // id conversation
+	idLastMsg?: string;
+	lengthMessagesImg?: string;
+}
+
+export interface GetListImgResponse {
+	id: string; // id conversation
+	idLastMessage?: string;
+	messages: Message[];
+	canGetMore: boolean;
 }

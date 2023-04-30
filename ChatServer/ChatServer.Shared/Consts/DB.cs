@@ -24,6 +24,7 @@ namespace ChatServer.Shared.Consts
 			public const short EMAIL_LENGTH = 200;
 			public const short ADDRESS_LENGTH = 100;
 			public const short AVATAR_LENGTH = 200;
+			public const short MESSAGE_KEY_LENGTH = 100;
 		}
 		public static class AppConversation
 		{

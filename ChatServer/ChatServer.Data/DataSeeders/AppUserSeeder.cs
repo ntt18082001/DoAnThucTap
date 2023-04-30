@@ -19,6 +19,7 @@ namespace ChatServer.Data.DataSeeders
 			var hashResult = PwdHashHelper.HashHMACSHA512(AppDefault.Password.DEFAULT);
 			var pwdHash = hashResult.Value;
 			var pwdSalt = hashResult.Key;
+			var messageKey = StringHasher.CreateSalt();
 
 			builder.HasData(
 				new AppUser
@@ -37,6 +38,7 @@ namespace ChatServer.Data.DataSeeders
 					UpdatedDate = now,
 					CreatedDate = now,
 					AppRoleId = RoleConst.AdminRole.ID,              // Vai trò được tạo ở AppRoleSeeder
+					MessageKey = messageKey
 				},
 				new AppUser
 				{
@@ -54,6 +56,7 @@ namespace ChatServer.Data.DataSeeders
 					UpdatedDate = now,
 					CreatedDate = now,
 					AppRoleId = RoleConst.UserRole.ID,              // Vai trò được tạo ở AppRoleSeeder
+					MessageKey = messageKey
 				}
 			);
 		}

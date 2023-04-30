@@ -13,8 +13,11 @@ namespace ChatServer.Data.Interfaces.Repositories
 	{
 		Task<IEnumerable<UserMessageDTO>> GetListFriend(int id, string searchString = null);
 		Task<UserMessageDTO> GetUserSelected(int id);
-		Task<bool> CheckExistConversation(int userId, int friendId);
+		Task<AppConversation> GetConversation(int userId, int friendId);
 		Task<ConversationDTO> SendMessage(SendMessageDTO model);
 		Task<IEnumerable<ConversationDTO>> GetListConversation(int id);
+		Task<string> GetSenderMessageKey(int id);
+		Task<GetMoreMessageDTO> GetMoreMessage(int idConv, int idLastMsg, int allDataGetted);
+		Task<ListImageMessageDTO> GetListImgMessage(int id, int? idLastMsg, int lengthData = 0);
 	}
 }

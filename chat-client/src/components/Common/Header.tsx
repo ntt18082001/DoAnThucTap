@@ -42,6 +42,8 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotifyList from 'features/notify/pages/NotifyList';
 import { selectLengthNotify } from 'features/notify/notifySlice';
 import { selectCountLastMessageNotSeen } from 'features/message/messageSlice';
+import { HubConnection } from '@microsoft/signalr';
+import { ChatHubContext } from 'features/hubs/ChatHubContext';
 
 interface HeaderProps {}
 
@@ -105,6 +107,8 @@ export function Header(props: HeaderProps) {
   const [menuNotify, setMenuNotify] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const openNotify = Boolean(menuNotify);
+
+  const hubConnection = React.useContext<HubConnection>(ChatHubContext);
 
   const handleClickMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -170,7 +174,12 @@ export function Header(props: HeaderProps) {
                 <IconButton aria-label="Message" size="large">
                   <Tooltip TransitionComponent={Zoom} title="Tin nhắn">
                     <NavLink to={routeMessage} style={{ color: darkBackground().color }}>
-                      <Badge badgeContent={notifyMessage} showZero color="error" sx={{ marginRight: '10px' }}>
+                      <Badge
+                        badgeContent={notifyMessage}
+                        showZero
+                        color="error"
+                        sx={{ marginRight: '10px' }}
+                      >
                         <MapsUgcIcon />
                       </Badge>
                     </NavLink>
@@ -288,7 +297,13 @@ export function Header(props: HeaderProps) {
                   {user?.fullName}
                 </MenuItem>
                 <Divider />
-                <MenuItem color="inherit" onClick={() => dispatch(logout())}>
+                <MenuItem
+                  color="inherit"
+                  onClick={() => {
+                    dispatch(logout());
+                    hubConnection.stop();
+                  }}
+                >
                   <ListItemIcon>
                     <Logout fontSize="small" />
                   </ListItemIcon>

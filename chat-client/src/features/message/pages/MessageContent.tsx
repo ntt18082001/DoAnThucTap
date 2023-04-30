@@ -38,6 +38,7 @@ const MessageContent = (props: Props) => {
 			sm={7}
 			md={8}
 			lg={9}
+      xl={10}
 			sx={{ borderRight: borderColor }}
 		>
 			<Conversation />

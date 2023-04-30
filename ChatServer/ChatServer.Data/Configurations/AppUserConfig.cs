@@ -45,6 +45,9 @@ namespace ChatServer.Data.Configurations
 			builder.Property(m => m.PasswordSalt)
 				.HasMaxLength(DB.AppUser.PWD_LENGTH);
 
+			builder.Property(m => m.MessageKey)
+				.HasMaxLength(DB.AppUser.MESSAGE_KEY_LENGTH);
+
 			builder.Property(m => m.PhoneNumber1)
 				.HasMaxLength(DB.AppUser.PHONE_LENGTH)
 				.IsUnicode(false);

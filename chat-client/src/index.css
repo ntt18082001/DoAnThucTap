@@ -67,3 +67,43 @@ a.active {
 .css-qkoq4h-MuiGrid-root > .MuiGrid-item {
   overflow: hidden;
 }
+
+.status-connect {
+  font-size: .75rem !important;
+}
+
+.url-msg {
+  color: white;
+  text-decoration: underline;
+}
+
+.image-screen {
+  width: 100%;
+  height: 300px !important;
+  border-radius: 10px;
+}
+
+@media only screen and (min-width: 768px) {
+  .image-screen {
+    height: 150px !important;
+  }
+}
+
+@media only screen and (min-width: 1900px) {
+  .image-screen {
+    height: 300px !important;
+  }
+}
+
+.grid-img {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 5px;
+}
+
+.EmojiPickerReact {
+  --epr-picker-height: 500px;
+  position: absolute !important;
+  top: 425px !important;
+  right: 65px !important;
+}

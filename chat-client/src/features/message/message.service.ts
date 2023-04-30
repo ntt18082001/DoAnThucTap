@@ -3,8 +3,8 @@ import { RootState } from 'app/store';
 import { baseURL } from 'endpoints';
 import { getToken } from 'features/auth/authSlice';
 import { SearchFriend } from 'models/friend.model';
-import { ConversationModel, SendMessage, UserMessage } from 'models/messages.model';
-import { SeenMessage } from '../../models/messages.model';
+import { ConversationModel, GetListImg, GetListImgResponse, GetMoreMessageResponse, UserMessage } from 'models/messages.model';
+import { SeenMessage, GetMoreMessage } from '../../models/messages.model';
 
 export const messageApi = createApi({
   reducerPath: 'messageApi',
@@ -27,7 +27,7 @@ export const messageApi = createApi({
     getUserSelected: builder.query<UserMessage, string>({
       query: (id) => `/message/GetUserSelected/${id}`
     }),
-    sendMessage: builder.mutation<ConversationModel, SendMessage>({
+    sendMessage: builder.mutation<ConversationModel, FormData>({
       query: (data) => ({
         url: '/message/SendMessage',
         method: 'POST',
@@ -57,8 +57,22 @@ export const messageApi = createApi({
         method: 'PUT',
         body: data
       })
+    }),
+    getMoreMessage: builder.mutation<GetMoreMessageResponse, GetMoreMessage>({
+      query: (data) => ({
+        url: '/message/getmoremessage',
+        method: 'PUT',
+        body: data
+      })
+    }),
+    getListMessageImage: builder.mutation<GetListImgResponse, GetListImg>({
+      query: (data) => ({
+        url: '/message/getlistmessageimage',
+        method: 'POST',
+        body: data
+      })
     })
   })
 });
 
-export const { useGetListFriendMessageQuery, useGetUserSelectedQuery, useSendMessageMutation, useGetListConversationQuery, useSeenMessageMutation, useToggleLikeMessageMutation, useDeleteMessageMutation } = messageApi;
+export const { useGetListFriendMessageQuery, useGetUserSelectedQuery, useSendMessageMutation, useGetListConversationQuery, useSeenMessageMutation, useToggleLikeMessageMutation, useDeleteMessageMutation, useGetMoreMessageMutation, useGetListMessageImageMutation } = messageApi;

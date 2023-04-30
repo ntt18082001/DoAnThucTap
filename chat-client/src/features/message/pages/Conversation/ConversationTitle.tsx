@@ -12,6 +12,8 @@ import { UserMessage } from 'models/messages.model';
 import InfoIcon from '@mui/icons-material/Info';
 import { colorMsgDarkmode } from '../../../../constants/index';
 import MessageInfo from '../MessageInfo';
+import { OnlineAvatar } from 'utils/OnlineAvatar';
+import { OfflineAvatar } from 'utils/OfflineAvatar';
 
 interface Props {
   user?: UserMessage;
@@ -41,18 +43,45 @@ const ConversationTitle = (props: Props) => {
       item
       sx={{
         borderBottom: borderColor,
-        p: '11px'
+        p: 1,
       }}
-      className='o-hidden'
+      className="o-hidden"
     >
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Box display="flex" alignItems="center">
-          {props?.user ? (
-            <Avatar alt="T" sx={{ mr: 1 }} src={`${baseURL}/${props?.user?.avatar}`} />
-          ) : (
-            <Avatar alt="T" sx={{ mr: 1 }} src={`${baseURL}/${defaultAvatar}`} />
+          {props?.user && props.user.isOnline && (
+            <OnlineAvatar
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              variant="dot"
+            >
+              <Avatar
+                alt={props.user.name}
+                src={`${baseURL}/${props?.user?.avatar}`}
+              />
+            </OnlineAvatar>
           )}
-          <Typography variant="body1">{props.user?.name}</Typography>
+          {props?.user && !props.user.isOnline && (
+            <OfflineAvatar
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              variant="dot"
+            >
+              <Avatar
+                alt={props.user.name}
+                src={`${baseURL}/${props?.user?.avatar}`}
+              />
+            </OfflineAvatar>
+          )}
+          {!props.user && <Avatar alt="T" sx={{ mr: 1 }} src={`${baseURL}/${defaultAvatar}`} />}
+          <Box sx={{ ml: 1 }}>
+            <Typography variant="body1">{props.user?.name}</Typography>
+            {props?.user && props.user.isOnline ? (
+              <Typography className='status-connect' component="p">Online</Typography>
+            ) : (
+              <Typography className='status-connect' component="p">Offline</Typography>
+            )}
+          </Box>
         </Box>
         <Box>
           <IconButton

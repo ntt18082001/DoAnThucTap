@@ -22,7 +22,7 @@ import {
   setUnfriend,
 } from 'features/friends/friendSlice';
 import { Unfriend } from 'models/friend.model';
-import { setConversations, setDeleteMessage, setMessage, setSeenLastMessage, toggleLikeMessage } from 'features/message/messageSlice';
+import { setConversations, setDeleteMessage, setFriendConnected, setFriendDisconnected, setIsScrollFalse, setMessage, setSeenLastMessage, toggleLikeMessage } from 'features/message/messageSlice';
 import { ConversationModel, Message, SeenMessage } from 'models/messages.model';
 import {
   useGetListConversationQuery,
@@ -39,7 +39,7 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
   const hubConnection = useContext<HubConnection>(ChatHubContext);
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const { data, isSuccess, refetch } = useGetListNotifyQuery();
-  const resultGetListConversation = useGetListConversationQuery();
+  const { data: dataConv, isSuccess: isSuccessConv, refetch: refetchConv } = useGetListConversationQuery();
 
   const { id } = useParams();
   const currentUserId = useAppSelector(selectUserId);
@@ -48,14 +48,15 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
   useEffect(() => {
     if (isLoggedIn) {
       refetch();
+      refetchConv();
     }
-  }, [isLoggedIn, refetch]);
+  }, [isLoggedIn, refetch, refetchConv]);
 
   useEffect(() => {
-    if (resultGetListConversation.isSuccess && resultGetListConversation.data) {
-      dispatch(setConversations(resultGetListConversation.data));
+    if (isSuccessConv && dataConv) {
+      dispatch(setConversations(dataConv));
     }
-  }, [resultGetListConversation, dispatch]);
+  }, [dispatch, isSuccessConv, dataConv]);
 
   useEffect(() => {
     if (isSuccess && data) {
@@ -137,6 +138,7 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
     if (hubConnection) {
       hubConnection.on('ReceiveMessage', (data: ConversationModel) => {
         dispatch(setMessage(data));
+        dispatch(setIsScrollFalse());
         if (id && currentUserId && id == data.lastMessage.senderId) {
           const handleSeenMessageInCurrentParams = async (message: Message) => {
             try {
@@ -201,6 +203,32 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
   }, [dispatch, hubConnection]);
 
   useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('FriendConnected', (data: string) => {
+        dispatch(setFriendConnected(data));
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('FriendConnected');
+      }
+    };
+  }, [dispatch, hubConnection]);
+
+  useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('FriendDisconnected', (data: string) => {
+        dispatch(setFriendDisconnected(data));
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('FriendDisconnected');
+      }
+    };
+  }, [dispatch, hubConnection]);
+
+  useEffect(() => {
     if (seenMessageResult.isSuccess && seenMessageResult.data) {
       dispatch(setSeenLastMessage(seenMessageResult.data));
     }
@@ -233,7 +261,7 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
               pl: '0px !important',
               pr: '0px !important',
               maxWidth: '100% !important',
-              overflow: 'hidden',
+              overflowY: 'scroll',
             }}
             className={darkmode ? 'darkmode-bg-color' : ''}
           >

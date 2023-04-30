@@ -18,5 +18,8 @@ namespace ChatServer.Data.Interfaces.Repositories
 		Task<AppUser> GetAccountByEmail(string email);
 		Task<IEnumerable<FriendDTO>> GetUserNotFriend(int id, string searchString = null);
 		Task<IEnumerable<FriendDTO>> GetListFriend(int id);
+		Task<bool> SetUserOnline(int id);
+		Task<bool> SetUserOffline(int id);
+		Task<List<string>> GetListFriendOnline(int id);
 	}
 }
