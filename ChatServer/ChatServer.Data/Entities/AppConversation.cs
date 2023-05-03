@@ -12,6 +12,7 @@ namespace ChatServer.Data.Entities
 		public AppConversation() 
 		{
 			Messages = new HashSet<AppMessage>();
+			AppInfoConversations = new HashSet<AppInfoConversation>();
 		}
 		public int UserId1 { get; set; } // UserId
 		public int UserId2 { get; set; } // FriendId
@@ -20,5 +21,6 @@ namespace ChatServer.Data.Entities
 		public AppUser AppUser1 { get; set; }
 		public AppUser AppUser2 { get; set; }
 		public ICollection<AppMessage> Messages { get; set; }
+		public ICollection<AppInfoConversation> AppInfoConversations { get; set; }
 	}
 }

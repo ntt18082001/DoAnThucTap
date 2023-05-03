@@ -17,6 +17,7 @@ namespace ChatServer.Data.Entities
 		public bool IsLiked { get; set; }
 		public DateTime SentTime { get; set; }
 		public bool IsSeen { get; set; }
+		public bool IsNotify { get; set; }
 		public AppConversation Conversation { get; set; }
 		public AppUser Sender { get; set; }
 		public AppUser Receiver { get; set; }

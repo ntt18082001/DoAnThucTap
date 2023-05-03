@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="MailKit" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.9" />
@@ -23,6 +24,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.13" />
+    <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
   </ItemGroup>
@@ -33,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Admin\ViewModels\" />
     <Folder Include="wwwroot\avatar\" />
   </ItemGroup>
 

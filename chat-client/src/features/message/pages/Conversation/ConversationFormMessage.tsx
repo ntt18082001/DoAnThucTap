@@ -8,7 +8,6 @@ import { CssInputBase } from '../../../../utils/CssTextField';
 import { PhotoCamera } from '@mui/icons-material';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
-import emoji from 'emoji-js';
 
 interface Props {
   onSubmit: (message: string, file?: File) => void;
@@ -73,13 +72,7 @@ const ConversationFormMessage = (props: Props) => {
           placeholder="Aa"
           multiline
           maxRows={3}
-          onChange={(ev) => {
-            const text = ev.target.value;
-            const emojiInstance = new emoji.EmojiConvertor();
-            // Tìm kiếm và thay thế các ký tự đặc biệt bằng emoji tương ứng
-            const newText = emojiInstance.replace_colons(text);
-            setMessage(newText);
-          }}
+          onChange={(ev) => setMessage(ev.target.value)}
           onKeyDown={(ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
             if (ev.key === 'Enter' && !ev.shiftKey) {
               ev.preventDefault();

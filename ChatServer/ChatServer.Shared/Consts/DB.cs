@@ -49,5 +49,17 @@ namespace ChatServer.Shared.Consts
 		{
 			public const string TABLE_NAME = "AppFriendShip";
 		}
+		public static class AppColorConversation
+		{
+			public const string TABLE_NAME = "AppColorConversation";
+			public const short BG_COLOR_CODE_LENGTH = 200;
+			public const short TEXT_COLOR_CODE_LENGTH = 200;
+		}
+		public static class AppInfoConversation
+		{
+			public const string TABLE_NAME = "AppInfoConversation";
+			public const short NICKNAME_LENGTH = 500;
+			public const short EMOJI_LENGTH = 200;
+		}
 	}
 }

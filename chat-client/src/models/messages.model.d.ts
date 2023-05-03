@@ -21,6 +21,8 @@ export interface ConversationModel {
 	user: UserMessage;
 	conversation: Message[];
 	lastMessage: Message;
+	colorConversation: ColorConversation;
+	infoConversation: InfoConversation;
 }
 
 export interface Message {
@@ -34,6 +36,7 @@ export interface Message {
 	urlImage?: string;
 	isLiked?: boolean;
 	isDelete?: boolean;
+	isNotify: boolean;
 }
 
 export interface SendMessage {
@@ -73,4 +76,15 @@ export interface GetListImgResponse {
 	idLastMessage?: string;
 	messages: Message[];
 	canGetMore: boolean;
+}
+
+export interface ColorConversation {
+	backgroundColorCode: string;
+	textColorCode: string;
+}
+
+export interface InfoConversation {
+	UserNickname: string;
+	FriendNickname: string;
+	MainEmoji: string;
 }

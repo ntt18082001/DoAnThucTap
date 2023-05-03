@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ChatServer.Api.Common.Mailer;
 using ChatServer.Api.Services;
 using ChatServer.Api.Services.Interfaces;
 using ChatServer.Api.ViewModels.User;
@@ -12,6 +13,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Security.Claims;
+using RazorEngine;
+using RazorEngine.Templating;
 
 namespace ChatServer.Api.Controllers
 {
@@ -21,13 +24,19 @@ namespace ChatServer.Api.Controllers
 	{
 		private readonly UserService _userService;
 		private readonly IFileStorageService _fileStorageService;
+		private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _env;
+		private readonly AppMailConfiguration _mailConfig;
 		public AccountController(
 			IMapper mapper,
 			UserService userService,
-			IFileStorageService fileStorageService) : base(mapper)
+			IFileStorageService fileStorageService,
+			Microsoft.AspNetCore.Hosting.IHostingEnvironment env,
+			AppMailConfiguration mailConfig) : base(mapper)
 		{
 			_userService = userService;
 			_fileStorageService = fileStorageService;
+			_env = env;
+			_mailConfig = mailConfig;
 		}
 		[AllowAnonymous]
 		[HttpPost("register")]
@@ -44,7 +53,7 @@ namespace ChatServer.Api.Controllers
 					Error = errorMessages
 				});
 			}
-			if (await _userService.CheckUserExist(x => x.Email == registerDTO.Email))
+			if (await _userService.CheckUserExist(x => x.Email == registerDTO.Email && x.DeletedDate == null))
 			{
 				return BadRequest(new
 				{
@@ -65,6 +74,10 @@ namespace ChatServer.Api.Controllers
 				user.Avatar = DEFAULT_FOLDER_AVATAR + "/" + DEFAULT_AVATAR;
 				user.MessageKey = StringHasher.CreateSalt();
 				var isSuccess = await _userService.Register(user);
+				if(isSuccess)
+				{
+					SendMail(user.Username, user.FullName);
+				}
 				return Ok(isSuccess);
 			}
 			catch (Exception ex)
@@ -188,6 +201,51 @@ namespace ChatServer.Api.Controllers
 			catch (Exception ex)
 			{
 				return BadRequest(ERROR_NAME);
+			}
+		}
+		private void SendMail(string email, string fullName)
+		{
+			try
+			{
+				var pathToFile = $"{_env.WebRootPath}" +
+					$"{Path.DirectorySeparatorChar}" +
+					$"mailTemplate{Path.DirectorySeparatorChar}emailSuccess.html";
+
+				var appMailSender = new AppMailSender()
+				{
+					Name = "TS-Chat",
+					Subject = "Cảm ơn bạn đã đăng ký sử dụng TS-Chat"
+				};
+
+				using (StreamReader SourceReader = System.IO.File.OpenText(pathToFile))
+				{
+					appMailSender.Content = SourceReader.ReadToEnd();
+				};
+
+				var appMailReciver = new AppMailReceiver()
+				{
+					Email = email,
+					Name = fullName
+				};
+
+				var contentMessage = Engine.Razor
+					.RunCompile(appMailSender.Content, "@",
+					null,
+					new
+					{
+						Name = appMailReciver.Name,
+						Signature = _mailConfig.Signature
+					});
+				appMailSender.Content = contentMessage;
+
+				AppMailer _emailMap = new AppMailer(_mailConfig);
+				_emailMap.Sender = appMailSender;
+				_emailMap.Reciver = appMailReciver;
+				_emailMap.Send();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
 			}
 		}
 	}

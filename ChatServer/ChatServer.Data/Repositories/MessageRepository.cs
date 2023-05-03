@@ -118,6 +118,8 @@ namespace ChatServer.Data.Repositories
 				{
 					lastMsg.UrlImage = AESThenHMAC.SimpleDecryptWithPassword(lastMsg.UrlImage, senderKey);
 				}
+				var listMsg = new List<MessageDTO>();
+				listMsg.Add(lastMsg);
 				return new ConversationDTO
 				{
 					Id = conversation.Id,
@@ -125,7 +127,7 @@ namespace ChatServer.Data.Repositories
 					FriendId = model.FriendId,
 					User = user,
 					Friend = friend,
-					Conversation = null,
+					Conversation = listMsg,
 					LastMessage = lastMsg,
 				};
 			}
@@ -343,7 +345,6 @@ namespace ChatServer.Data.Repositories
 									IsDelete = false
 								})
 								.OrderByDescending(x => x.Id)
-								.Take(10)
 								.ToListAsync();
 				}
 				else
@@ -365,7 +366,6 @@ namespace ChatServer.Data.Repositories
 									IsDelete = false
 								})
 								.OrderByDescending(x => x.Id)
-								.Take(20)
 								.ToListAsync();
 				}
 				foreach (var msg in mesgs)

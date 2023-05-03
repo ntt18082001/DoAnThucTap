@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ChatServer.Api.Common.AddHeaderSwaggen;
+using ChatServer.Api.Common.Mailer;
 using ChatServer.Api.Services;
 using ChatServer.Api.Services.Interfaces;
 using ChatServer.Data;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using System.Configuration;
 using System.Text;
 
 namespace ChatServer.Api.WebConfig
@@ -130,6 +132,11 @@ namespace ChatServer.Api.WebConfig
 				options.MemoryBufferThreshold = Int32.MaxValue;
 			});
 			services.AddSignalR();
+
+			// Khởi tạo thông tin mail
+			AppMailConfiguration mailConfig = new();
+			mailConfig.LoadFromConfig(configuration);
+			services.AddSingleton(mailConfig);
 		}
 	}
 }

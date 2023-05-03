@@ -16,5 +16,7 @@ namespace ChatServer.Shared.DTOs.Message
 		public UserMessageDTO User { get; set; }
 		public IEnumerable<MessageDTO> Conversation { get; set; }
 		public MessageDTO LastMessage { get; set; }
+		public ColorConversationDTO ColorConversation { get; set; }
+		public InfoConversationDTO InfoConversation { get; set; }
 	}
 }
