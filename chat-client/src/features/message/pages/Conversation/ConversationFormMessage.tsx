@@ -1,5 +1,5 @@
 import SendIcon from '@mui/icons-material/Send';
-import { Grid, IconButton, Paper } from '@mui/material';
+import { Box, Grid, IconButton, Paper, Typography } from '@mui/material';
 import { useAppSelector } from 'app/hooks';
 import { selectIsDarkmode } from 'features/darkmode/darkmodeSlice';
 import React, { ChangeEvent, useState } from 'react';
@@ -11,6 +11,7 @@ import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 interface Props {
   onSubmit: (message: string, file?: File) => void;
+  mainEmoji?: string;
 }
 
 const ConversationFormMessage = (props: Props) => {
@@ -82,12 +83,24 @@ const ConversationFormMessage = (props: Props) => {
           }}
           value={message}
         />
-        {isShowEmojiPicker && <EmojiPicker onEmojiClick={onClickSelectEmoji} lazyLoadEmojis />}
-        <IconButton sx={{ p: '15px' }} color="warning" onClick={toggleShowPicker}>
-          <EmojiEmotionsIcon />
-        </IconButton>
+        {isShowEmojiPicker && (
+          <Box className="emoji-position">
+            <EmojiPicker onEmojiClick={onClickSelectEmoji} lazyLoadEmojis />
+          </Box>
+        )}
+        <Box sx={{ borderRight: borderColor }}>
+          <IconButton sx={{ p: '15px' }} color="warning" onClick={toggleShowPicker}>
+            <EmojiEmotionsIcon />
+          </IconButton>
+        </Box>
         <IconButton sx={{ p: '15px' }} color="secondary" type="submit">
-          <SendIcon />
+          {!props.mainEmoji && <SendIcon />}
+          {props.mainEmoji && (
+            <Typography
+              sx={{ fontSize: '20px' }}
+              dangerouslySetInnerHTML={{ __html: props.mainEmoji }}
+            />
+          )}
         </IconButton>
       </Paper>
     </Grid>

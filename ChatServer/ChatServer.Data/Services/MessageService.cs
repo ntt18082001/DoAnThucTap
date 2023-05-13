@@ -1,6 +1,7 @@
 ﻿using ChatServer.Data.Entities;
 using ChatServer.Data.Interfaces.UnitOfWork;
 using ChatServer.Shared.DTOs.Message;
+using ChatServer.Shared.DTOs.Message.Nickname;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,14 @@ namespace ChatServer.Data.Services
 		public async Task<ListImageMessageDTO> GetListMessageImage(int id, int? idLastMsg, int lengthData = 0)
 		{
 			return await _unitOfWork.MessageRepository.GetListImgMessage(id, idLastMsg, lengthData);
+		}
+		public async Task<UpdateEmojiResponseDTO> UpdateInfoConv(UpdateEmojiDTO model)
+		{
+			return await _unitOfWork.MessageRepository.UpdateInfoConv(model);
+		}
+		public async Task<UpdateNicknameResponseDTO> UpdateNickname(UpdateNicknameDTO model)
+		{
+			return await _unitOfWork.MessageRepository.UpdateNickname(model);
 		}
 	}
 }

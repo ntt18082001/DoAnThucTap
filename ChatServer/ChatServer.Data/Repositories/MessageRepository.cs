@@ -2,16 +2,19 @@
 using ChatServer.Data.Interfaces.Repositories;
 using ChatServer.Shared.DTOs.Friends;
 using ChatServer.Shared.DTOs.Message;
+using ChatServer.Shared.DTOs.Message.Nickname;
 using ChatServer.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using XAct;
+using XAct.Users;
 
 namespace ChatServer.Data.Repositories
 {
@@ -36,10 +39,12 @@ namespace ChatServer.Data.Repositories
 			{
 				var existConv = await GetConversation(model.UserId, model.FriendId);
 				var conversation = new AppConversation();
-				if(existConv != null)
+				if (existConv != null)
 				{
 					conversation = existConv;
-				} else {
+				}
+				else
+				{
 					conversation.UserId1 = model.UserId;
 					conversation.UserId2 = model.FriendId;
 					conversation.StartTime = DateTime.Now;
@@ -55,16 +60,17 @@ namespace ChatServer.Data.Repositories
 				message.SenderId = model.UserId;
 				message.ReceiverId = model.FriendId;
 				message.CreatedDate = DateTime.Now;
-				if(model.Image != null)
+				if (model.Image != null)
 				{
 					message.UrlImage = AESThenHMAC.SimpleEncryptWithPassword(model.Image, senderKey);
-				} else
+				}
+				else
 				{
 					message.UrlImage = model.Image;
 
 				}
 				message.SentTime = DateTime.Now;
-				if(model.Content != null)
+				if (model.Content != null)
 				{
 					message.Content = AESThenHMAC.SimpleEncryptWithPassword(model.Content, senderKey);
 				}
@@ -92,9 +98,31 @@ namespace ChatServer.Data.Repositories
 							IsOnline = x.IsOnline
 						})
 						.SingleOrDefaultAsync();
+				var userNickname = await _context
+						.AppNicknames
+						.Where(x => x.ConversationId == conversation.Id && x.UserId == model.UserId)
+						.Select(x => new NicknameDTO
+						{
+							Id = x.Id,
+							ConversationId = x.ConversationId,
+							UserId = x.UserId,
+							Nickname = x.Nickname
+						})
+						.SingleOrDefaultAsync();
+				var friendNickname = await _context
+						.AppNicknames
+						.Where(x => x.ConversationId == conversation.Id && x.UserId == model.FriendId)
+						.Select(x => new NicknameDTO
+						{
+							Id = x.Id,
+							ConversationId = x.ConversationId,
+							UserId = x.UserId,
+							Nickname = x.Nickname
+						})
+						.SingleOrDefaultAsync();
 				var lastMsg = await dbSet
 						.AsNoTracking()
-						.Where(x => x.ConversationId == conversation.Id && x.DeletedDate == null)
+						.Where(x => x.ConversationId == conversation.Id && x.IsNotify == false && x.DeletedDate == null)
 						.Select(x => new MessageDTO
 						{
 							Id = x.Id,
@@ -110,14 +138,32 @@ namespace ChatServer.Data.Repositories
 						})
 						.OrderByDescending(x => x.Id)
 						.FirstOrDefaultAsync();
-				if(lastMsg.Content != null)
+				if (lastMsg.Content != null)
 				{
 					lastMsg.Content = AESThenHMAC.SimpleDecryptWithPassword(lastMsg.Content, senderKey);
 				}
-				if(lastMsg.UrlImage!= null)
+				if (lastMsg.UrlImage != null)
 				{
 					lastMsg.UrlImage = AESThenHMAC.SimpleDecryptWithPassword(lastMsg.UrlImage, senderKey);
 				}
+				var infoConv = await _context
+						.AppInfoConversations
+						.Include(x => x.AppColorConversation)
+						.Where(x => x.ConversationId == conversation.Id)
+						.Select(x => new InfoConversationDTO
+						{
+							Id = x.Id,
+							ConversationId = x.ConversationId,
+							MainEmoji = x.MainEmoji,
+							ColorId = x.ColorId,
+							ColorConversation = x.AppColorConversation != null ? new ColorConversationDTO
+							{
+								Id = x.AppColorConversation.Id,
+								TextColorCode = x.AppColorConversation.TextColorCode,
+								BackgroundColorCode = x.AppColorConversation.BackgroundColorCode
+							} : null
+						})
+						.SingleOrDefaultAsync();
 				var listMsg = new List<MessageDTO>();
 				listMsg.Add(lastMsg);
 				return new ConversationDTO
@@ -129,9 +175,11 @@ namespace ChatServer.Data.Repositories
 					Friend = friend,
 					Conversation = listMsg,
 					LastMessage = lastMsg,
+					UserNickname = userNickname,
+					FriendNickname = friendNickname
 				};
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return null;
 			}
@@ -212,7 +260,7 @@ namespace ChatServer.Data.Repositories
 					var listMsg = await dbSet
 							.AsNoTracking()
 							.Include(x => x.Sender)
-							.Where(x => x.ConversationId == item.Id && x.DeletedDate == null)
+							.Where(x => x.ConversationId == item.Id && x.IsNotify == false && x.DeletedDate == null)
 							.Select(x => new MessageDTO
 							{
 								Id = x.Id,
@@ -232,17 +280,17 @@ namespace ChatServer.Data.Repositories
 					var countListMsg = await dbSet
 							.AsNoTracking()
 							.Include(x => x.Sender)
-							.Where(x => x.ConversationId == item.Id && x.DeletedDate == null)
+							.Where(x => x.ConversationId == item.Id && x.IsNotify == false && x.DeletedDate == null)
 							.CountAsync();
 					if (listMsg.Count() < countListMsg) item.CanGetMore = true;
 					foreach (var msg in listMsg)
 					{
 						var key = await GetSenderMessageKey(msg.SenderId);
-						if(msg.Content != null)
+						if (msg.Content != null)
 						{
 							msg.Content = AESThenHMAC.SimpleDecryptWithPassword(msg.Content, key);
 						}
-						if(msg.UrlImage != null)
+						if (msg.UrlImage != null)
 						{
 							msg.UrlImage = AESThenHMAC.SimpleDecryptWithPassword(msg.UrlImage, key);
 						}
@@ -250,10 +298,54 @@ namespace ChatServer.Data.Repositories
 					listMsg.Reverse();
 					item.Conversation = listMsg;
 					item.LastMessage = listMsg.LastOrDefault();
+
+					var userNickname = await _context
+						.AppNicknames
+						.Where(x => x.ConversationId == item.Id && x.UserId == item.UserId)
+						.Select(x => new NicknameDTO
+						{
+							Id = x.Id,
+							ConversationId = x.ConversationId,
+							UserId = x.UserId,
+							Nickname = x.Nickname
+						})
+						.SingleOrDefaultAsync();
+					var friendNickname = await _context
+							.AppNicknames
+							.Where(x => x.ConversationId == item.Id && x.UserId == item.FriendId)
+							.Select(x => new NicknameDTO
+							{
+								Id = x.Id,
+								ConversationId = x.ConversationId,
+								UserId = x.UserId,
+								Nickname = x.Nickname
+							})
+							.SingleOrDefaultAsync();
+					item.UserNickname = userNickname;
+					item.FriendNickname = friendNickname;
+					var infoConv = await _context
+						.AppInfoConversations
+						.Include(x => x.AppColorConversation)
+						.Where(x => x.ConversationId == item.Id)
+						.Select(x => new InfoConversationDTO
+						{
+							Id = x.Id,
+							ConversationId = x.ConversationId,
+							MainEmoji = x.MainEmoji,
+							ColorId = x.ColorId,
+							ColorConversation = x.AppColorConversation != null ? new ColorConversationDTO
+							{
+								Id = x.AppColorConversation.Id,
+								TextColorCode = x.AppColorConversation.TextColorCode,
+								BackgroundColorCode = x.AppColorConversation.BackgroundColorCode
+							} : null
+						})
+						.SingleOrDefaultAsync();
+					item.InfoConversation = infoConv;
 				}
 				return result.OrderByDescending(x => x.LastMessage.SentTime);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return null;
 			}
@@ -274,7 +366,7 @@ namespace ChatServer.Data.Repositories
 			{
 				var lstMsg = await dbSet
 							.AsNoTracking()
-							.Where(x => x.ConversationId == idConv && x.Id < idLastMsg && x.DeletedDate == null)
+							.Where(x => x.ConversationId == idConv && x.Id < idLastMsg && x.IsNotify == false && x.DeletedDate == null)
 							.Select(x => new MessageDTO
 							{
 								Id = x.Id,
@@ -294,11 +386,11 @@ namespace ChatServer.Data.Repositories
 				foreach (var msg in lstMsg)
 				{
 					var key = await GetSenderMessageKey(msg.SenderId);
-					if(msg.Content != null)
+					if (msg.Content != null)
 					{
 						msg.Content = AESThenHMAC.SimpleDecryptWithPassword(msg.Content, key);
 					}
-					if(msg.UrlImage != null)
+					if (msg.UrlImage != null)
 					{
 						msg.UrlImage = AESThenHMAC.SimpleDecryptWithPassword(msg.UrlImage, key);
 					}
@@ -306,7 +398,7 @@ namespace ChatServer.Data.Repositories
 				lstMsg.Reverse();
 				var countCanGetMore = await dbSet
 								.AsNoTracking()
-								.Where(x => x.ConversationId == idConv && x.DeletedDate == null)
+								.Where(x => x.ConversationId == idConv && x.IsNotify == false && x.DeletedDate == null)
 								.CountAsync();
 				return new GetMoreMessageDTO
 				{
@@ -316,7 +408,7 @@ namespace ChatServer.Data.Repositories
 					CanGetMore = (allDataGetted + lstMsg.Count) < countCanGetMore
 				};
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return null;
 			}
@@ -390,7 +482,132 @@ namespace ChatServer.Data.Repositories
 					CanGetMore = (lengthData + mesgs.Count()) < countCanGetMore
 				};
 			}
-			catch(Exception ex)
+			catch (Exception ex)
+			{
+				return null;
+			}
+		}
+
+		public async Task<UpdateEmojiResponseDTO> UpdateInfoConv(UpdateEmojiDTO model)
+		{
+			try
+			{
+				AppInfoConversation infoConv;
+				if (model.InfoConvId != null)
+				{
+					infoConv = await _context
+							.AppInfoConversations
+							.Include(x => x.AppColorConversation)
+							.Where(x => x.Id == model.InfoConvId && x.DeletedDate == null)
+							.SingleOrDefaultAsync();
+				}
+				else
+				{
+					infoConv = new AppInfoConversation();
+					infoConv.ConversationId = model.ConversationId;
+				}
+				infoConv.MainEmoji = model.Emoji;
+				if (model.InfoConvId == null)
+				{
+					await _context.AddAsync(infoConv);
+				}
+
+				var message = new AppMessage();
+				message.Content = $"{{emoji}} đã đổi biểu cảm thành {model.Emoji}";
+				message.SenderId = model.SenderId;
+				message.ReceiverId = model.ReceiverId;
+				message.ConversationId = model.ConversationId;
+				message.IsNotify = true;
+				await _context.AddAsync(message);
+
+				await _context.SaveChangesAsync();
+
+				return new UpdateEmojiResponseDTO
+				{
+					ConversationId = model.ConversationId,
+					InfoConversationDTO = new InfoConversationDTO
+					{
+						Id = infoConv.Id,
+						ConversationId = infoConv.ConversationId,
+						MainEmoji = infoConv.MainEmoji,
+						ColorId = infoConv.ColorId,
+						ColorConversation = infoConv.AppColorConversation != null ? new ColorConversationDTO
+						{
+							Id = infoConv.AppColorConversation.Id,
+							TextColorCode = infoConv.AppColorConversation.TextColorCode,
+							BackgroundColorCode = infoConv.AppColorConversation.BackgroundColorCode
+						} : null
+					},
+					NotifyMessage = new MessageDTO
+					{
+						Id = message.Id,
+						Content = message.Content,
+						IsNotify = message.IsNotify,
+						SenderId = message.SenderId,
+						ReceiverId = message.ReceiverId
+					}
+				};
+			}
+			catch (Exception ex)
+			{
+				return null;
+			}
+		}
+		public async Task<UpdateNicknameResponseDTO> UpdateNickname(UpdateNicknameDTO model)
+		{
+			try
+			{
+				AppNickname nickname;
+				if (model.NicknameId != null)
+				{
+					nickname = await _context
+							.AppNicknames
+							.Where(x => x.ConversationId == model.ConversationId && x.Id == model.NicknameId && x.DeletedDate == null)
+							.SingleOrDefaultAsync();
+				}
+				else
+				{
+					nickname = new AppNickname();
+					nickname.ConversationId = model.ConversationId;
+					nickname.UserId = model.UserIdUpdated;
+				}
+				nickname.Nickname = model.Nickname;
+				if (model.NicknameId == null)
+				{
+					await _context.AddAsync(nickname);
+				}
+				var message = new AppMessage();
+				message.Content = $"{{1}} đã thay đổi biệt danh của {{2}} thành '{model.Nickname}'";
+				message.SenderId = model.SenderId;
+				message.ReceiverId = model.ReceiverId;
+				message.ConversationId = model.ConversationId;
+				message.IsNotify = true;
+				await _context.AddAsync(message);
+
+				await _context.SaveChangesAsync();
+
+				return new UpdateNicknameResponseDTO
+				{
+					ConversationId = model.ConversationId,
+					Nickname = new NicknameDTO
+					{
+						Id = nickname.Id,
+						ConversationId = nickname.ConversationId,
+						UserId = nickname.UserId,
+						Nickname = nickname.Nickname
+					},
+					NotifyMessage = new MessageDTO
+					{
+						Id = message.Id,
+						Content = message.Content,
+						IsNotify = message.IsNotify,
+						SenderId = message.SenderId,
+						ReceiverId = message.ReceiverId,
+						UpdatedIdFor = model.UserIdUpdated
+					}
+				};
+			}
+			catch (Exception ex)
 			{
 				return null;
 			}

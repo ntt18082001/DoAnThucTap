@@ -1,9 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { useAppSelector } from 'app/hooks';
 import { baseURL } from 'endpoints';
-import { LoginModel, LoginResponse, RegisterModel, UserModel } from 'models/useridentity.model';
+import { ForgotPasswordModel, LoginModel, LoginResponse, RegisterModel, UserModel, VerifyCodeModel } from 'models/useridentity.model';
 import { getToken, selectToken } from './authSlice';
 import { RootState } from 'app/store';
+import { NewPassword } from '../../models/useridentity.model';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -38,8 +39,29 @@ export const authApi = createApi({
         method: 'PUT',
         body: data
       })
+    }),
+    forgotPassword: builder.mutation<ForgotPasswordModel, ForgotPasswordModel>({
+      query: (data) => ({
+        url: '/account/forgotpassword',
+        method: 'POST',
+        body: data
+      })
+    }),
+    checkCode: builder.mutation<VerifyCodeModel, VerifyCodeModel>({
+      query: (data) => ({
+        url: '/account/checkcode',
+        method: 'POST',
+        body: data
+      })
+    }),
+    createNewPwd: builder.mutation<boolean, NewPassword>({
+      query: (data) => ({
+        url: '/account/createnewpwd',
+        method: 'POST',
+        body: data
+      })
     })
   })
 });
 
-export const { useLoginMutation, useRegisterMutation, useUpdateUserMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useUpdateUserMutation, useForgotPasswordMutation, useCheckCodeMutation, useCreateNewPwdMutation } = authApi;

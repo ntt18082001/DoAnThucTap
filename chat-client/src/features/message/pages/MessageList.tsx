@@ -144,12 +144,13 @@ function MessageList(props: Props) {
         {listConversation.length > 0 &&
           listConversation.map((conv) => {
             const user = conv.userId === currentUserId ? conv.friend : conv.user;
-            const friend = conv.friendId === conv.lastMessage.senderId ? conv.friend : conv.user; 
+            const friend = conv.friendId === conv.lastMessage.senderId ? conv.friend : conv.user;
             return (
               <MessageListItem
                 key={conv.id}
                 user={user}
                 friend={friend}
+                friendNickname={conv.friendNickname}
                 onClick={handleSelectedUser}
               />
             );

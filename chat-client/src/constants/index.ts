@@ -5,6 +5,12 @@ export const routeLogin = "login";
 export const routeRegister = "register";
 export const routeProfile = "profile";
 export const routeFriends = "friends";
+export const routeForgotPassword = "forgotpassword";
+
+// Route Admin
+export const routeAdmin = "admin";
+export const routeUserAdmin = "user";
+export const routeColorAdmin = "color";
 
 // Default Mode
 export const defaultColor = "#262626";

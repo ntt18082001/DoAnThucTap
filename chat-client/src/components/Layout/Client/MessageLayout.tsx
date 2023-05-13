@@ -1,8 +1,7 @@
 import { Grid, LinearProgress } from '@mui/material';
-import MessageList from '../../features/message/pages/MessageList';
+import MessageList from '../../../features/message/pages/MessageList';
 import React, { Suspense, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import MessageInfo from 'features/message/pages/MessageInfo';
 import { useAppSelector } from 'app/hooks';
 import { selectIsLoggedIn } from 'features/auth/authSlice';
 

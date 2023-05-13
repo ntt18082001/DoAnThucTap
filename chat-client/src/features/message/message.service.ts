@@ -4,7 +4,7 @@ import { baseURL } from 'endpoints';
 import { getToken } from 'features/auth/authSlice';
 import { SearchFriend } from 'models/friend.model';
 import { ConversationModel, GetListImg, GetListImgResponse, GetMoreMessageResponse, UserMessage } from 'models/messages.model';
-import { SeenMessage, GetMoreMessage } from '../../models/messages.model';
+import { SeenMessage, GetMoreMessage, UpdateInfoConvRequest, UpdateNickname } from '../../models/messages.model';
 
 export const messageApi = createApi({
   reducerPath: 'messageApi',
@@ -71,8 +71,22 @@ export const messageApi = createApi({
         method: 'POST',
         body: data
       })
+    }),
+    updateInfoConv: builder.mutation<boolean, UpdateInfoConvRequest>({
+      query: (data) => ({
+        url: '/message/updateinfoconv',
+        method: 'POST',
+        body: data
+      })
+    }),
+    updateNicknameConv: builder.mutation<boolean, UpdateNickname>({
+      query: (data) => ({
+        url: '/message/updatenickname',
+        method: 'POST',
+        body: data
+      })
     })
   })
 });
 
-export const { useGetListFriendMessageQuery, useGetUserSelectedQuery, useSendMessageMutation, useGetListConversationQuery, useSeenMessageMutation, useToggleLikeMessageMutation, useDeleteMessageMutation, useGetMoreMessageMutation, useGetListMessageImageMutation } = messageApi;
+export const { useGetListFriendMessageQuery, useGetUserSelectedQuery, useSendMessageMutation, useGetListConversationQuery, useSeenMessageMutation, useToggleLikeMessageMutation, useDeleteMessageMutation, useGetMoreMessageMutation, useGetListMessageImageMutation, useUpdateInfoConvMutation, useUpdateNicknameConvMutation } = messageApi;

@@ -14,9 +14,10 @@ namespace ChatServer.Shared.DTOs.Message
 		public bool CanGetMore { get; set; }
 		public UserMessageDTO Friend { get; set; }
 		public UserMessageDTO User { get; set; }
+		public NicknameDTO UserNickname { get; set; }
+		public NicknameDTO FriendNickname { get; set; }
 		public IEnumerable<MessageDTO> Conversation { get; set; }
 		public MessageDTO LastMessage { get; set; }
-		public ColorConversationDTO ColorConversation { get; set; }
 		public InfoConversationDTO InfoConversation { get; set; }
 	}
 }

@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useGetListUserNotFriendQuery } from '../friends.service';
 import { SearchFriend } from 'models/friend.model';
-import SkeletonFriend from 'components/Common/SkeletonFriend';
+import SkeletonFriend from 'components/Common/Client/SkeletonFriend';
 import FriendItem from './FriendItem';
 import { useAppDispatch, useAppSelector } from 'app/hooks';
 import { selectFriends, setFriends } from '../friendSlice';

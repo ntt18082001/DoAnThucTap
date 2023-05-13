@@ -26,6 +26,9 @@ const Conversation = (props: Props) => {
 
   const handleSubmitMessage = async (message: string, file?: File) => {
     try {
+      if(selectConversation?.infoConversation && selectConversation.infoConversation.mainEmoji && message === '') {
+        message = selectConversation.infoConversation.mainEmoji;
+      }
       if (message === '' && file === undefined) {
         return;
       }
@@ -62,9 +65,9 @@ const Conversation = (props: Props) => {
         alignItems="stretch"
         sx={{ height: '100%' }}
       >
-        <ConversationTitle user={selectedUser} />
+        <ConversationTitle user={selectedUser} conv={selectConversation} />
         <ConversationContent conversations={selectConversation} />
-        <ConversationFormMessage onSubmit={handleSubmitMessage} />
+        <ConversationFormMessage onSubmit={handleSubmitMessage} mainEmoji={selectConversation?.infoConversation?.mainEmoji} />
       </Grid>
     </>
   );

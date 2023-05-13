@@ -7,7 +7,7 @@ import CustomMessageButton from '../../../utils/CustomMessageButton';
 import { selectIsDarkmode } from '../../darkmode/darkmodeSlice';
 import { colorMsgDarkmode, blackColor, routeMessage } from '../../../constants/index';
 import { baseURL } from 'endpoints';
-import { Message, UserMessage } from 'models/messages.model';
+import { Message, NicknameConv, UserMessage } from 'models/messages.model';
 import { selectUserId } from 'features/auth/authSlice';
 import { OnlineAvatar } from 'utils/OnlineAvatar';
 import { OfflineAvatar } from 'utils/OfflineAvatar';
@@ -17,6 +17,8 @@ interface Props {
   user: UserMessage;
   friend: UserMessage;
   onClick: (user: UserMessage, lastMessage: Message | undefined) => void;
+  userNickname?: NicknameConv;
+  friendNickname?: NicknameConv;
 }
 
 const MessageListItem = (props: Props) => {
@@ -37,13 +39,21 @@ const MessageListItem = (props: Props) => {
   useEffect(() => {
     if (lastMesg) {
       if (!lastMesg.isDelete) {
-        setLastMessage(
-          lastMesg.senderId === currentUserId
-            ? `Bạn: ${lastMesg.content ? lastMesg.content : 'Đã gửi hình ảnh'}`
-            : lastMesg.content
-            ? lastMesg.content
-            : `${props.friend.name} đã gửi hình ảnh`
-        );
+        if (!lastMesg.isNotify) {
+          setLastMessage(
+            lastMesg.senderId === currentUserId
+              ? `Bạn: ${lastMesg.content ? lastMesg.content : 'Đã gửi hình ảnh'}`
+              : lastMesg.content
+              ? lastMesg.content
+              : `${props.friend.name} đã gửi hình ảnh`
+          );
+        } else {
+          setLastMessage(
+            lastMesg.senderId === currentUserId
+              ? 'Bạn đã thay đổi thông tin cuộc trò chuyện'
+              : `${props.friend.name} đã thay đổi thông tin cuộc trò chuyện`
+          );
+        }
       } else {
         setLastMessage(
           lastMesg.senderId === currentUserId
@@ -109,7 +119,7 @@ const MessageListItem = (props: Props) => {
             }}
           >
             <Box sx={{ textAlign: 'start', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              <Typography variant="body1">{name}</Typography>
+              <Typography variant="body1">{props.friendNickname ? props.friendNickname.nickname : name}</Typography>
               <Typography
                 variant="caption"
                 component="p"

@@ -1,5 +1,6 @@
 ﻿using ChatServer.Data.Entities;
 using ChatServer.Shared.DTOs.Message;
+using ChatServer.Shared.DTOs.Message.Nickname;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,7 @@ namespace ChatServer.Data.Interfaces.Repositories
 		Task<string> GetSenderMessageKey(int id);
 		Task<GetMoreMessageDTO> GetMoreMessage(int idConv, int idLastMsg, int allDataGetted);
 		Task<ListImageMessageDTO> GetListImgMessage(int id, int? idLastMsg, int lengthData = 0);
+		Task<UpdateEmojiResponseDTO> UpdateInfoConv(UpdateEmojiDTO model);
+		Task<UpdateNicknameResponseDTO> UpdateNickname(UpdateNicknameDTO model);
 	}
 }

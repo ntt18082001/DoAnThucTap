@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react';
 import { CssLoadingButton } from 'utils/CssTextField';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-import FormLayout from '../../../components/Layout/FormLayout';
+import FormLayout from '../../../components/Layout/Client/FormLayout';
 
 interface AuthFormProps<TModel> {
 	title: string;

@@ -21,7 +21,7 @@ import { baseURL } from 'endpoints';
 import * as React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   backGroundHeader,
   blackColor,
@@ -29,14 +29,20 @@ import {
   borderColorDarkmode,
   borderColorDefault,
   mainColor,
+  routeAdmin,
   routeFriends,
   routeLogin,
   routeMessage,
   routeProfile,
   routeRegister,
-} from '../../constants';
-import { logout, selectUser, selectIsLoggedIn } from '../../features/auth/authSlice';
-import { selectIsDarkmode, updateDarkmode } from '../../features/darkmode/darkmodeSlice';
+} from '../../../constants';
+import {
+  logout,
+  selectUser,
+  selectIsLoggedIn,
+  selectToken,
+} from '../../../features/auth/authSlice';
+import { selectIsDarkmode, updateDarkmode } from '../../../features/darkmode/darkmodeSlice';
 import { GroupAdd, Logout } from '@mui/icons-material';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotifyList from 'features/notify/pages/NotifyList';
@@ -44,6 +50,8 @@ import { selectLengthNotify } from 'features/notify/notifySlice';
 import { selectCountLastMessageNotSeen } from 'features/message/messageSlice';
 import { HubConnection } from '@microsoft/signalr';
 import { ChatHubContext } from 'features/hubs/ChatHubContext';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { isAdmin } from 'features/auth/handleJwt';
 
 interface HeaderProps {}
 
@@ -108,6 +116,8 @@ export function Header(props: HeaderProps) {
   const open = Boolean(anchorEl);
   const openNotify = Boolean(menuNotify);
 
+  const token = useAppSelector(selectToken);
+
   const hubConnection = React.useContext<HubConnection>(ChatHubContext);
 
   const handleClickMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -142,6 +152,10 @@ export function Header(props: HeaderProps) {
 
   const redirectToProfile = () => {
     navigate(`${routeProfile}/${user?.id}`);
+  };
+
+  const redirectToAdmin = () => {
+    navigate(routeAdmin);
   };
 
   return (
@@ -296,6 +310,14 @@ export function Header(props: HeaderProps) {
                   <Avatar alt={user?.fullName} src={`${baseURL}/${user?.avatar}`} />
                   {user?.fullName}
                 </MenuItem>
+                {token && isAdmin(token) && (
+                  <MenuItem color="inherit" onClick={redirectToAdmin}>
+                    <ListItemIcon>
+                      <AdminPanelSettingsIcon fontSize="small" />
+                    </ListItemIcon>
+                    Quản lý Website
+                  </MenuItem>
+                )}
                 <Divider />
                 <MenuItem
                   color="inherit"

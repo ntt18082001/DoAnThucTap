@@ -8,7 +8,7 @@ import {
   borderColorDefault,
   defaultAvatar,
 } from '../../../../constants/index';
-import { UserMessage } from 'models/messages.model';
+import { ConversationModel, UserMessage } from 'models/messages.model';
 import InfoIcon from '@mui/icons-material/Info';
 import { colorMsgDarkmode } from '../../../../constants/index';
 import MessageInfo from '../MessageInfo';
@@ -17,6 +17,7 @@ import { OfflineAvatar } from 'utils/OfflineAvatar';
 
 interface Props {
   user?: UserMessage;
+  conv?: ConversationModel;
 }
 
 const ConversationTitle = (props: Props) => {
@@ -26,6 +27,8 @@ const ConversationTitle = (props: Props) => {
   const borderColor = isDarkmode ? borderColorDarkmode : borderColorDefault;
   const bgColor = isDarkmode ? 'rgb(255,255,255,.1)' : colorMsgDarkmode;
   const bgColorHover = isDarkmode ? 'rgb(255,255,255,.2)' : '#dbdbdb';
+
+  const { conv } = props;
 
   const handleToggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
@@ -75,7 +78,7 @@ const ConversationTitle = (props: Props) => {
           )}
           {!props.user && <Avatar alt="T" sx={{ mr: 1 }} src={`${baseURL}/${defaultAvatar}`} />}
           <Box sx={{ ml: 1 }}>
-            <Typography variant="body1">{props.user?.name}</Typography>
+            <Typography variant="body1">{props.conv?.friendNickname ? props.conv.friendNickname.nickname : props.user?.name}</Typography>
             {props?.user && props.user.isOnline ? (
               <Typography className='status-connect' component="p">Online</Typography>
             ) : (
@@ -99,7 +102,7 @@ const ConversationTitle = (props: Props) => {
           >
             <InfoIcon />
           </IconButton>
-          <MessageInfo isOpen={drawerMsg} toggleDrawer={handleToggleDrawer} />
+          <MessageInfo isOpen={drawerMsg} toggleDrawer={handleToggleDrawer} conv={conv} />
         </Box>
       </Box>
     </Grid>

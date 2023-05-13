@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DataMessage, UserMessage } from "models/messages.model";
 import { RootState } from '../../app/store';
-import { ConversationModel, GetMoreMessageResponse } from '../../models/messages.model';
+import { ConversationModel, GetMoreMessageResponse, UpdateInfoConvResponse, UpdateNicknameResponse } from '../../models/messages.model';
 
 
 const initialState: DataMessage = {
@@ -125,11 +125,48 @@ export const messageSlice = createSlice({
                state.conversations[indexConv].conversation = action.payload.messages.concat(state.conversations[indexConv].conversation);
             }
          }
+      },
+      setInfoConv: (state, action: PayloadAction<UpdateInfoConvResponse>) => {
+         if(action.payload) {
+            const indexConv = state.conversations.findIndex(x => x.id === action.payload.conversationId);
+            if(indexConv > -1) {
+               state.conversations[indexConv].infoConversation = action.payload.infoConversationDTO;
+               state.conversations[indexConv].conversation.push(action.payload.notifyMessage);
+               state.conversations[indexConv].lastMessage = action.payload.notifyMessage;
+               const tempConv = state.conversations[indexConv];
+               state.conversations.splice(indexConv, 1);
+               state.conversations.unshift(tempConv);
+            }
+         }
+      },
+      setNicknameConv: (state, action: PayloadAction<UpdateNicknameResponse>) => {
+         if(action.payload) {
+            const indexConv = state.conversations.findIndex(x => x.id === action.payload.conversationId);
+            if(indexConv > -1) {
+               if(state.conversations[indexConv].userNickname && state.conversations[indexConv].userNickname.userId === action.payload.nickname.userId) {
+                  state.conversations[indexConv].userNickname = action.payload.nickname;
+               }
+               if(state.conversations[indexConv].friendNickname && state.conversations[indexConv].friendNickname.userId === action.payload.nickname.userId) {
+                  state.conversations[indexConv].friendNickname = action.payload.nickname;
+               }
+               if(!state.conversations[indexConv].userNickname && state.conversations[indexConv].userId === action.payload.nickname.userId) {
+                  state.conversations[indexConv].userNickname = action.payload.nickname;
+               }
+               if(!state.conversations[indexConv].friendNickname && state.conversations[indexConv].friendId === action.payload.nickname.userId) {
+                  state.conversations[indexConv].userNickname = action.payload.nickname;
+               }
+               state.conversations[indexConv].conversation.push(action.payload.notifyMessage);
+               state.conversations[indexConv].lastMessage = action.payload.notifyMessage;
+               const tempConv = state.conversations[indexConv];
+               state.conversations.splice(indexConv, 1);
+               state.conversations.unshift(tempConv);
+            }
+         }
       }
    }
 });
 
-export const { setConversations, setSelectedUser, setMessage, setSeenLastMessage, toggleLikeMessage, setDeleteMessage, setFriendConnected, setFriendDisconnected, setListFindUser, setIsScrollFalse, setIsScrollTrue, setListMessageToConversation } = messageSlice.actions;
+export const { setConversations, setSelectedUser, setMessage, setSeenLastMessage, toggleLikeMessage, setDeleteMessage, setFriendConnected, setFriendDisconnected, setListFindUser, setIsScrollFalse, setIsScrollTrue, setListMessageToConversation, setInfoConv, setNicknameConv } = messageSlice.actions;
 
 export const selectSelectedUser = (state: RootState) => state.message.selectedUser;
 export const selectConversations = (state: RootState) => state.message.conversations;

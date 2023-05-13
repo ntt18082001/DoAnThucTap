@@ -4,9 +4,10 @@ import HomeIcon from '@mui/icons-material/Home';
 import { Avatar, Box, Button, createTheme, CssBaseline, Grid, Paper, Typography } from '@mui/material';
 import { ReactElement, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppSelector } from '../../app/hooks';
-import { selectIsDarkmode } from '../../features/darkmode/darkmodeSlice';
+import { useAppSelector } from '../../../app/hooks';
+import { selectIsDarkmode } from '../../../features/darkmode/darkmodeSlice';
 import { selectIsLoggedIn } from "features/auth/authSlice";
+import { routeForgotPassword } from "../../../constants";
 
 interface FormLayoutProps {
 	children: ReactElement;
@@ -79,6 +80,13 @@ export default function FormLayout(props: FormLayoutProps) {
 								<Link to="/">
 									<Button variant="outlined" endIcon={<HomeIcon />} color="secondary">
 										Trang chủ
+									</Button>
+								</Link>
+							</Grid>
+							<Grid item xs>
+								<Link to={`/${routeForgotPassword}`}>
+									<Button variant="outlined" color="secondary">
+										Quên mật khẩu
 									</Button>
 								</Link>
 							</Grid>

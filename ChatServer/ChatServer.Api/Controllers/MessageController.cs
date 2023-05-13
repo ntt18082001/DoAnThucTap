@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ChatServer.Api.Services.Interfaces;
 using System.Security.Claims;
+using ChatServer.Shared.DTOs.Message.Nickname;
 
 namespace ChatServer.Api.Controllers
 {
@@ -197,6 +198,36 @@ namespace ChatServer.Api.Controllers
 			{
 				var listImg = await _messageService.GetListMessageImage(model.Id, model.IdLastMsg, model.LengthMessagesImg);
 				return Ok(listImg);
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ERROR_NAME);
+			}
+		}
+		[HttpPost("UpdateInfoConv")]
+		public async Task<IActionResult> UpdateInfoConv([FromBody] UpdateEmojiDTO model)
+		{
+			try
+			{
+				var response = await _messageService.UpdateInfoConv(model);
+				await _hubContext.Clients.Users(model.SenderId.ToString(), model.ReceiverId.ToString())
+						.SendAsync("ReceiveNotifyMessage", response);
+				return Ok(true);
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ERROR_NAME);
+			}
+		}
+		[HttpPost("UpdateNickname")]
+		public async Task<IActionResult> UpdateNickname(UpdateNicknameDTO model)
+		{
+			try
+			{
+				var response = await _messageService.UpdateNickname(model);
+				await _hubContext.Clients.Users(model.SenderId.ToString(), model.ReceiverId.ToString())
+						.SendAsync("ReceiveNotifyMessageNickname", response);
+				return Ok(true);
 			}
 			catch(Exception ex)
 			{

@@ -32,7 +32,8 @@ namespace ChatServer.Data.Migrations
 
                     b.Property<string>("BackgroundColorCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int");
@@ -48,7 +49,8 @@ namespace ChatServer.Data.Migrations
 
                     b.Property<string>("TextColorCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
@@ -58,7 +60,7 @@ namespace ChatServer.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppColorConversation");
+                    b.ToTable("AppColorConversation", (string)null);
                 });
 
             modelBuilder.Entity("ChatServer.Data.Entities.AppConversation", b =>
@@ -203,13 +205,7 @@ namespace ChatServer.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AppColorConversationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AppConversationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ColorId")
+                    b.Property<int?>("ColorId")
                         .HasColumnType("int");
 
                     b.Property<int>("ConversationId")
@@ -227,10 +223,6 @@ namespace ChatServer.Data.Migrations
                     b.Property<int?>("DisplayOrder")
                         .HasColumnType("int");
 
-                    b.Property<string>("FriendNickname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("MainEmoji")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -241,17 +233,13 @@ namespace ChatServer.Data.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserNickname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("AppColorConversationId");
+                    b.HasIndex("ColorId");
 
-                    b.HasIndex("AppConversationId");
+                    b.HasIndex("ConversationId");
 
-                    b.ToTable("AppInfoConversation");
+                    b.ToTable("AppInfoConversation", (string)null);
                 });
 
             modelBuilder.Entity("ChatServer.Data.Entities.AppMessage", b =>
@@ -318,6 +306,50 @@ namespace ChatServer.Data.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("AppMessage", (string)null);
+                });
+
+            modelBuilder.Entity("ChatServer.Data.Entities.AppNickname", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("AppNickname", (string)null);
                 });
 
             modelBuilder.Entity("ChatServer.Data.Entities.AppRole", b =>
@@ -483,9 +515,9 @@ namespace ChatServer.Data.Migrations
                             Email = "ntt18082001@gmail.com",
                             FullName = "Tiến Sĩ",
                             IsOnline = false,
-                            MessageKey = "ẶƵ(éÃ#ÝẰXXVẮẫỮẻẳčŦỐF{ⱦKĨḤRaḨỷÝẾẼấọnọỈ",
-                            PasswordHash = new byte[] { 220, 16, 100, 231, 28, 202, 30, 229, 123, 178, 21, 103, 119, 199, 225, 88, 247, 58, 103, 140, 97, 197, 78, 37, 232, 27, 214, 41, 11, 231, 56, 67, 229, 15, 15, 206, 34, 171, 87, 26, 55, 232, 222, 129, 56, 136, 209, 221, 159, 126, 88, 178, 189, 7, 172, 217, 169, 252, 112, 2, 66, 197, 112, 102 },
-                            PasswordSalt = new byte[] { 10, 7, 211, 186, 34, 17, 69, 184, 241, 142, 152, 135, 204, 119, 55, 124, 136, 248, 62, 60, 84, 227, 169, 138, 207, 218, 253, 70, 130, 144, 253, 122, 180, 63, 109, 169, 223, 129, 63, 0, 212, 210, 207, 234, 174, 191, 81, 49, 158, 57, 55, 35, 180, 207, 174, 100, 21, 194, 103, 9, 188, 157, 153, 149, 178, 41, 20, 173, 188, 0, 172, 150, 14, 95, 179, 41, 224, 253, 154, 42, 98, 44, 13, 62, 172, 184, 177, 59, 167, 223, 225, 68, 237, 94, 35, 197, 163, 75, 97, 73, 215, 72, 245, 17, 24, 239, 111, 130, 99, 200, 89, 141, 248, 34, 238, 196, 39, 84, 43, 142, 77, 93, 81, 72, 214, 9, 105, 202 },
+                            MessageKey = "ệõĩṱũìÕẦkFÈĈ$ỢẮẵãắfừvĈặƵ-ÁẢỹẲẹÔ{@zỘúề",
+                            PasswordHash = new byte[] { 180, 201, 240, 239, 243, 26, 190, 236, 232, 221, 209, 34, 110, 129, 208, 207, 77, 64, 202, 152, 211, 193, 26, 65, 202, 112, 190, 82, 93, 124, 34, 253, 23, 212, 14, 142, 233, 17, 86, 135, 199, 111, 197, 11, 236, 249, 127, 88, 79, 188, 108, 10, 154, 238, 167, 74, 112, 69, 97, 19, 248, 115, 94, 51 },
+                            PasswordSalt = new byte[] { 158, 4, 239, 17, 115, 125, 100, 225, 197, 69, 181, 67, 111, 203, 55, 79, 40, 235, 144, 0, 21, 22, 177, 38, 92, 95, 171, 20, 231, 132, 214, 120, 144, 173, 152, 26, 141, 221, 96, 104, 8, 44, 102, 25, 66, 3, 38, 225, 139, 233, 135, 36, 199, 127, 234, 138, 70, 238, 29, 220, 165, 41, 217, 225, 29, 58, 177, 204, 100, 87, 46, 201, 40, 28, 11, 70, 134, 135, 27, 169, 108, 222, 90, 66, 62, 70, 68, 88, 27, 82, 236, 166, 140, 97, 76, 5, 55, 254, 85, 29, 23, 225, 7, 246, 59, 33, 63, 119, 97, 178, 84, 80, 124, 49, 196, 231, 180, 133, 147, 18, 255, 240, 170, 16, 70, 158, 62, 158 },
                             PhoneNumber1 = "0928666158",
                             PhoneNumber2 = "0928666156",
                             UpdatedBy = -1,
@@ -502,15 +534,67 @@ namespace ChatServer.Data.Migrations
                             Email = "ntt180801@gmail.com",
                             FullName = "Tiến Sĩ 2",
                             IsOnline = false,
-                            MessageKey = "ẶƵ(éÃ#ÝẰXXVẮẫỮẻẳčŦỐF{ⱦKĨḤRaḨỷÝẾẼấọnọỈ",
-                            PasswordHash = new byte[] { 220, 16, 100, 231, 28, 202, 30, 229, 123, 178, 21, 103, 119, 199, 225, 88, 247, 58, 103, 140, 97, 197, 78, 37, 232, 27, 214, 41, 11, 231, 56, 67, 229, 15, 15, 206, 34, 171, 87, 26, 55, 232, 222, 129, 56, 136, 209, 221, 159, 126, 88, 178, 189, 7, 172, 217, 169, 252, 112, 2, 66, 197, 112, 102 },
-                            PasswordSalt = new byte[] { 10, 7, 211, 186, 34, 17, 69, 184, 241, 142, 152, 135, 204, 119, 55, 124, 136, 248, 62, 60, 84, 227, 169, 138, 207, 218, 253, 70, 130, 144, 253, 122, 180, 63, 109, 169, 223, 129, 63, 0, 212, 210, 207, 234, 174, 191, 81, 49, 158, 57, 55, 35, 180, 207, 174, 100, 21, 194, 103, 9, 188, 157, 153, 149, 178, 41, 20, 173, 188, 0, 172, 150, 14, 95, 179, 41, 224, 253, 154, 42, 98, 44, 13, 62, 172, 184, 177, 59, 167, 223, 225, 68, 237, 94, 35, 197, 163, 75, 97, 73, 215, 72, 245, 17, 24, 239, 111, 130, 99, 200, 89, 141, 248, 34, 238, 196, 39, 84, 43, 142, 77, 93, 81, 72, 214, 9, 105, 202 },
+                            MessageKey = "ệõĩṱũìÕẦkFÈĈ$ỢẮẵãắfừvĈặƵ-ÁẢỹẲẹÔ{@zỘúề",
+                            PasswordHash = new byte[] { 180, 201, 240, 239, 243, 26, 190, 236, 232, 221, 209, 34, 110, 129, 208, 207, 77, 64, 202, 152, 211, 193, 26, 65, 202, 112, 190, 82, 93, 124, 34, 253, 23, 212, 14, 142, 233, 17, 86, 135, 199, 111, 197, 11, 236, 249, 127, 88, 79, 188, 108, 10, 154, 238, 167, 74, 112, 69, 97, 19, 248, 115, 94, 51 },
+                            PasswordSalt = new byte[] { 158, 4, 239, 17, 115, 125, 100, 225, 197, 69, 181, 67, 111, 203, 55, 79, 40, 235, 144, 0, 21, 22, 177, 38, 92, 95, 171, 20, 231, 132, 214, 120, 144, 173, 152, 26, 141, 221, 96, 104, 8, 44, 102, 25, 66, 3, 38, 225, 139, 233, 135, 36, 199, 127, 234, 138, 70, 238, 29, 220, 165, 41, 217, 225, 29, 58, 177, 204, 100, 87, 46, 201, 40, 28, 11, 70, 134, 135, 27, 169, 108, 222, 90, 66, 62, 70, 68, 88, 27, 82, 236, 166, 140, 97, 76, 5, 55, 254, 85, 29, 23, 225, 7, 246, 59, 33, 63, 119, 97, 178, 84, 80, 124, 49, 196, 231, 180, 133, 147, 18, 255, 240, 170, 16, 70, 158, 62, 158 },
                             PhoneNumber1 = "0123456789",
                             PhoneNumber2 = "0123456789",
                             UpdatedBy = -1,
                             UpdatedDate = new DateTime(2023, 4, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Username = "tiensi"
                         });
+                });
+
+            modelBuilder.Entity("ChatServer.Data.Entities.AppVerifyCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Expired")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<bool>("IsVerified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("TokenString")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AppVerifyCode", (string)null);
                 });
 
             modelBuilder.Entity("ChatServer.Data.Entities.MstStatusRequest", b =>
@@ -629,13 +713,11 @@ namespace ChatServer.Data.Migrations
                 {
                     b.HasOne("ChatServer.Data.Entities.AppColorConversation", "AppColorConversation")
                         .WithMany("AppInfoConversations")
-                        .HasForeignKey("AppColorConversationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ColorId");
 
                     b.HasOne("ChatServer.Data.Entities.AppConversation", "AppConversation")
                         .WithMany("AppInfoConversations")
-                        .HasForeignKey("AppConversationId")
+                        .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -671,6 +753,17 @@ namespace ChatServer.Data.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("ChatServer.Data.Entities.AppNickname", b =>
+                {
+                    b.HasOne("ChatServer.Data.Entities.AppConversation", "AppConversation")
+                        .WithMany("AppNicknames")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppConversation");
+                });
+
             modelBuilder.Entity("ChatServer.Data.Entities.AppUser", b =>
                 {
                     b.HasOne("ChatServer.Data.Entities.AppRole", "AppRole")
@@ -682,6 +775,16 @@ namespace ChatServer.Data.Migrations
                     b.Navigation("AppRole");
                 });
 
+            modelBuilder.Entity("ChatServer.Data.Entities.AppVerifyCode", b =>
+                {
+                    b.HasOne("ChatServer.Data.Entities.AppUser", "AppUser")
+                        .WithMany("AppVerifyCodeNavigation")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("AppUser");
+                });
+
             modelBuilder.Entity("ChatServer.Data.Entities.AppColorConversation", b =>
                 {
                     b.Navigation("AppInfoConversations");
@@ -690,6 +793,8 @@ namespace ChatServer.Data.Migrations
             modelBuilder.Entity("ChatServer.Data.Entities.AppConversation", b =>
                 {
                     b.Navigation("AppInfoConversations");
+
+                    b.Navigation("AppNicknames");
 
                     b.Navigation("Messages");
                 });
@@ -704,6 +809,8 @@ namespace ChatServer.Data.Migrations
                     b.Navigation("AppFriends1");
 
                     b.Navigation("AppFriends2");
+
+                    b.Navigation("AppVerifyCodeNavigation");
 
                     b.Navigation("ConversationsOfUser1");
 

@@ -7,3 +7,8 @@ export const isAccessTokenExpired = (token: string) => {
   const now = Date.now();
   return now >= expirationTime;
 }
+
+export const isAdmin = (token: string) => {
+  const decodedToken: any = jwt_decode(token);
+  return decodedToken.role === "Admin";
+}

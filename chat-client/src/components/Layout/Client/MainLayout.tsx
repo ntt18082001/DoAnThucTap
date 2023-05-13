@@ -3,9 +3,9 @@ import { Backdrop, Container, LinearProgress } from '@mui/material';
 import React, { Suspense, useContext, useEffect, useState } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 
-import { bodyBgColorBlack, bodyBgColorDefault } from '../../constants';
-import { Header } from '../Common/Header';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { bodyBgColorBlack, bodyBgColorDefault } from '../../../constants';
+import { Header } from '../../Common/Client/Header';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { selectIsDarkmode } from 'features/darkmode/darkmodeSlice';
 import { HubConnection } from '@microsoft/signalr';
 import { ChatHubContext } from 'features/hubs/ChatHubContext';
@@ -22,8 +22,8 @@ import {
   setUnfriend,
 } from 'features/friends/friendSlice';
 import { Unfriend } from 'models/friend.model';
-import { setConversations, setDeleteMessage, setFriendConnected, setFriendDisconnected, setIsScrollFalse, setMessage, setSeenLastMessage, toggleLikeMessage } from 'features/message/messageSlice';
-import { ConversationModel, Message, SeenMessage } from 'models/messages.model';
+import { setConversations, setDeleteMessage, setFriendConnected, setFriendDisconnected, setInfoConv, setIsScrollFalse, setMessage, setNicknameConv, setSeenLastMessage, toggleLikeMessage } from 'features/message/messageSlice';
+import { ConversationModel, Message, SeenMessage, UpdateInfoConvResponse, UpdateNicknameResponse } from 'models/messages.model';
 import {
   useGetListConversationQuery,
   useSeenMessageMutation,
@@ -224,6 +224,32 @@ const MainLayout: React.FC = (props: MainLayoutProps): JSX.Element => {
     return () => {
       if (hubConnection) {
         hubConnection.off('FriendDisconnected');
+      }
+    };
+  }, [dispatch, hubConnection]);
+
+  useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('ReceiveNotifyMessage', (data: UpdateInfoConvResponse) => {
+        dispatch(setInfoConv(data));
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('ReceiveNotifyMessage');
+      }
+    };
+  }, [dispatch, hubConnection]);
+
+  useEffect(() => {
+    if (hubConnection) {
+      hubConnection.on('ReceiveNotifyMessageNickname', (data: UpdateNicknameResponse) => {
+        dispatch(setNicknameConv(data));
+      });
+    }
+    return () => {
+      if (hubConnection) {
+        hubConnection.off('ReceiveNotifyMessageNickname');
       }
     };
   }, [dispatch, hubConnection]);

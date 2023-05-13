@@ -19,6 +19,10 @@ namespace ChatServer.Data
 		public DbSet<AppMessage> AppMessages { get; set; }
 		public DbSet<AppFriendRequest> AppFriendsRequests { get; set; }
 		public DbSet<AppFriendShip> AppFriendsShip { get; set; }
+		public DbSet<AppColorConversation> AppColorsConversation { get; set; }
+		public DbSet<AppInfoConversation> AppInfoConversations { get; set; }
+		public DbSet<AppVerifyCode> AppVerifyCodes { get; set; }
+		public DbSet<AppNickname> AppNicknames { get; set; }
 
 		public AppChatDbContext(DbContextOptions options) : base(options) { }
 
@@ -31,6 +35,10 @@ namespace ChatServer.Data
 			modelBuilder.ApplyConfiguration(new AppMessageConfig());
 			modelBuilder.ApplyConfiguration(new AppFriendRequestConfig());
 			modelBuilder.ApplyConfiguration(new AppFriendShipConfig());
+			modelBuilder.ApplyConfiguration(new AppInfoConversationConfig());
+			modelBuilder.ApplyConfiguration(new AppColorConversationConfig());
+			modelBuilder.ApplyConfiguration(new AppVerifyCodeConfig());
+			modelBuilder.ApplyConfiguration(new AppNicknameConfig());
 
 			// SeedData
 			modelBuilder.Entity<AppRole>().SeedData();

@@ -27,7 +27,10 @@ namespace ChatServer.Data.Repositories
 
 		public async Task<AppUser> GetAccountByEmail(string email)
 		{
-			throw new NotImplementedException();
+			return await dbSet
+				.Where(x => x.Email.Equals(email) && x.DeletedDate == null)
+				.OrderByDescending(x => x.Id)
+				.SingleOrDefaultAsync();
 		}
 
 		public async Task<AppUser> GetUser(int id)
@@ -133,6 +136,17 @@ namespace ChatServer.Data.Repositories
 					.Where(x => x.Id != id && x.IsOnline == true && x.DeletedDate == null && friends.Contains(x.Id))
 					.Select(x => x.Id.ToString())
 					.ToListAsync();
+		}
+
+		public async Task AddVerifyCode(AppVerifyCode code)
+		{
+			await _context.AddAsync(code);
+		}
+
+		public async Task<AppVerifyCode> GetVerifyCode(string code)
+		{
+			return await _context
+				.AppVerifyCodes.SingleOrDefaultAsync(x => x.TokenString.Equals(code));
 		}
 	}
 }

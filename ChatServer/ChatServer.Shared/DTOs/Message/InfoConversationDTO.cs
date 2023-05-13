@@ -8,8 +8,10 @@ namespace ChatServer.Shared.DTOs.Message
 {
 	public class InfoConversationDTO
 	{
-		public string UserNickname { get; set; }
-		public string FriendNickname { get; set; }
+		public int Id { get; set; }
+		public int ConversationId { get; set; }
+		public int? ColorId { get; set; }
 		public string MainEmoji { get; set; }
+		public ColorConversationDTO ColorConversation { get; set; }
 	}
 }

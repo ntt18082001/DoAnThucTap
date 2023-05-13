@@ -19,9 +19,10 @@ export interface ConversationModel {
 	canGetMore: boolean;
 	friend: UserMessage;
 	user: UserMessage;
+	userNickname: NicknameConv;
+	friendNickname: NicknameConv;
 	conversation: Message[];
 	lastMessage: Message;
-	colorConversation: ColorConversation;
 	infoConversation: InfoConversation;
 }
 
@@ -37,6 +38,7 @@ export interface Message {
 	isLiked?: boolean;
 	isDelete?: boolean;
 	isNotify: boolean;
+	updatedIdFor?: string;
 }
 
 export interface SendMessage {
@@ -79,12 +81,51 @@ export interface GetListImgResponse {
 }
 
 export interface ColorConversation {
+	id: string;
 	backgroundColorCode: string;
 	textColorCode: string;
 }
 
 export interface InfoConversation {
-	UserNickname: string;
-	FriendNickname: string;
-	MainEmoji: string;
+	id: string;
+	conversationId: string;
+	colorId: string;
+	mainEmoji: string;
+	colorConversation: ColorConversation;
+}
+
+export interface UpdateInfoConvRequest {
+	conversationId?: string;
+	infoConvId?: string;
+	senderId?: string;
+	receiverId?: string;
+	emoji: string;
+}
+
+export interface UpdateInfoConvResponse {
+	conversationId: string;
+	infoConversationDTO: InfoConversation;
+	notifyMessage: Message;
+}
+
+export interface NicknameConv {
+	id: string;
+	conversationId: string;
+	userId: string;
+	nickname: string;
+}
+
+export interface UpdateNickname {
+	conversationId?: string;
+	nicknameId?: string;
+	senderId?: string;
+	receiverId?: string;
+	userIdUpdated?: string;
+	nickname: string;
+}
+
+export interface UpdateNicknameResponse {
+	conversationId: string;
+	nickname: NicknameConv;
+	notifyMessage: Message;
 }

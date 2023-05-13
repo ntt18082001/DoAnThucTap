@@ -19,5 +19,6 @@ namespace ChatServer.Shared.DTOs.Message
 		public bool IsDelete { get; set; }
 		public DateTime SentTime { get; set; }
 		public bool IsNotify { get; set; }
+		public int? UpdatedIdFor { get; set; }
 	}
 }

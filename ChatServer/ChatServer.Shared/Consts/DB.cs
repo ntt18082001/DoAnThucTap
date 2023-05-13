@@ -61,5 +61,16 @@ namespace ChatServer.Shared.Consts
 			public const short NICKNAME_LENGTH = 500;
 			public const short EMOJI_LENGTH = 200;
 		}
+		public static class AppVerifyCode
+		{
+			public const string TABLE_NAME = "AppVerifyCode";
+			public const string DEFAULT_DATE = "GETDATE()";
+			public const bool IS_VERIFIED = false;
+		}
+		public static class AppNickname
+		{
+			public const string TABLE_NAME = "AppNickname";
+			public const short NICKNAME_LENGTH = 500;
+		}
 	}
 }

@@ -18,12 +18,6 @@ namespace ChatServer.Data.Configurations
 
 			// Khóa chính
 			builder.HasKey(x => x.Id);
-
-			builder.Property(m => m.UserNickname)
-				.HasMaxLength(DB.AppInfoConversation.NICKNAME_LENGTH);
-			builder.Property(m => m.FriendNickname)
-				.HasMaxLength(DB.AppInfoConversation.NICKNAME_LENGTH);
-
 			// Khóa ngoại
 			builder.HasOne(m => m.AppConversation)
 				.WithMany(m => m.AppInfoConversations)

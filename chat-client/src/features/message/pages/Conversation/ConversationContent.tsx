@@ -48,7 +48,7 @@ const ConversationContent = (props: Props) => {
   };
 
   useEffect(() => {
-    if(props.conversations && isFirstCanGetMore) {
+    if (props.conversations && isFirstCanGetMore) {
       setAllowScrollEvent(true);
       setIsFirstCanGetMore(false);
     }
@@ -108,7 +108,8 @@ const ConversationContent = (props: Props) => {
             if (props.conversations) {
               if (
                 props.conversations.conversation[index]?.receiverId !==
-                props.conversations.conversation[index + 1]?.receiverId
+                  props.conversations.conversation[index + 1]?.receiverId &&
+                !props.conversations.conversation[index]?.isNotify
               ) {
                 isAvatar = true;
               }

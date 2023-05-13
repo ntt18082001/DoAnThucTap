@@ -19,6 +19,7 @@ namespace ChatServer.Data.Entities
 			ReceiveRequests = new HashSet<AppFriendRequest>();
 			AppFriends1 = new HashSet<AppFriendShip>();
 			AppFriends2 = new HashSet<AppFriendShip>();
+			AppVerifyCodeNavigation = new HashSet<AppVerifyCode>();
 		}
 		public string? Username { get; set; }
 		public byte[]? PasswordHash { get; set; }
@@ -46,5 +47,7 @@ namespace ChatServer.Data.Entities
 
 		public ICollection<AppFriendShip> AppFriends1 { get; set; }
 		public ICollection<AppFriendShip> AppFriends2 { get; set; }
+
+		public ICollection<AppVerifyCode> AppVerifyCodeNavigation { get; set; }
 	}
 }

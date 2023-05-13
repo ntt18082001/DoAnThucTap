@@ -1,5 +1,3 @@
-import { Message } from './messages.model';
-
 export interface LoginModel {
 	email: string;
 	password: string;
@@ -53,4 +51,19 @@ export interface ChangePasswordModel {
 	password: string;
 	newPassword: string;
 	confirmNewPassword: string;
+}
+
+export interface ForgotPasswordModel {
+	email: string;
+}
+
+export interface VerifyCodeModel {
+	code: string;
+}
+
+export interface NewPassword {
+	email: string;
+	code: string;
+	password: string;
+	confirmPwd: string;
 }

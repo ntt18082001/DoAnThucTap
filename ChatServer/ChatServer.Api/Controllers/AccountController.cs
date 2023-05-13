@@ -15,6 +15,7 @@ using System.Linq;
 using System.Security.Claims;
 using RazorEngine;
 using RazorEngine.Templating;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace ChatServer.Api.Controllers
 {
@@ -76,7 +77,7 @@ namespace ChatServer.Api.Controllers
 				var isSuccess = await _userService.Register(user);
 				if(isSuccess)
 				{
-					SendMail(user.Username, user.FullName);
+					SendMail(user.Username, user.FullName, "emailSuccess.html");
 				}
 				return Ok(isSuccess);
 			}
@@ -203,13 +204,133 @@ namespace ChatServer.Api.Controllers
 				return BadRequest(ERROR_NAME);
 			}
 		}
-		private void SendMail(string email, string fullName)
+		[AllowAnonymous]
+		[HttpPost("forgotpassword")]
+		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPassword model)
+		{
+			if (!ModelState.IsValid)
+			{
+				var errorMessages = ModelState.Values
+											.SelectMany(x => x.Errors)
+											.Select(x => x.ErrorMessage)
+											.ToList();
+				return BadRequest(new
+				{
+					Error = errorMessages
+				});
+			}
+			var user = await _userService.GetUser(model.Email);
+			if (user == null)
+			{
+				return BadRequest(new
+				{
+					Error = new
+					{
+						Email = "Email không tồn tại!"
+					}
+				});
+			}
+			try
+			{
+				var code = VerifyCodeHelper.CreateCode();
+				var verifyCode = new AppVerifyCode()
+				{
+					TokenString = code,
+					CreatedDate = DateTime.Now,
+					Expired = DateTime.Now.AddMinutes(EXPIRED_VERIFY_CODE),
+					UserId = user.Id
+				};
+				await _userService.AddVerifyCode(verifyCode);
+				SendMail(user.Email, user.FullName, "emailTemplate.html", code);
+				return Ok(new
+				{
+					Email = model.Email
+				});
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ERROR_NAME);
+			}
+		}
+		[AllowAnonymous]
+		[HttpPost("checkcode")]
+		public async Task<IActionResult> CheckVerifyCode([FromBody] VerifyCodeVM model)
+		{
+			try
+			{
+				var code = await _userService.GetVerifyCode(model.Code);
+				if (code == null)
+				{
+					return BadRequest(new
+					{
+						Error = new
+						{
+							Code = "Code không tồn tại!"
+						}
+					});
+				}
+				if (VerifyCodeHelper.IsCodeExpired(code.Expired))
+				{
+					return BadRequest(new
+					{
+						Error = new
+						{
+							Code = "Code đã hết hạn!"
+						}
+					});
+				}
+				return Ok(new
+				{
+					Code = code.TokenString
+				});
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ERROR_NAME);
+			}
+		}
+		[AllowAnonymous]
+		[HttpPost("createnewpwd")]
+		public async Task<IActionResult> CreateNewPwd([FromBody] NewPasswordVM model)
+		{
+			if (!ModelState.IsValid)
+			{
+				var errorMessages = ModelState.Values
+											.SelectMany(x => x.Errors)
+											.Select(x => x.ErrorMessage)
+											.ToList();
+				return BadRequest(new
+				{
+					Error = errorMessages
+				});
+			}
+			var code = await _userService.GetVerifyCode(model.Code);
+			var user = await _userService.GetUser(code.UserId ?? 0);
+			if(user == null)
+			{
+				return BadRequest(ERROR_NAME);
+			}
+			try
+			{
+				var hashResult = PwdHashHelper.HashHMACSHA512(model.Password);
+				user.PasswordHash = hashResult.Value;
+				user.PasswordSalt = hashResult.Key;
+				var isSuccess = await _userService.UpdateUser(user);
+				return Ok(isSuccess);
+			}
+			catch(Exception ex)
+			{
+				return Ok(false);
+			}
+		}
+
+		private void SendMail(string email, string fullName, string template, string code = "")
 		{
 			try
 			{
 				var pathToFile = $"{_env.WebRootPath}" +
 					$"{Path.DirectorySeparatorChar}" +
-					$"mailTemplate{Path.DirectorySeparatorChar}emailSuccess.html";
+					$"mailTemplate{Path.DirectorySeparatorChar}{template}";
 
 				var appMailSender = new AppMailSender()
 				{
@@ -234,7 +355,8 @@ namespace ChatServer.Api.Controllers
 					new
 					{
 						Name = appMailReciver.Name,
-						Signature = _mailConfig.Signature
+						Signature = _mailConfig.Signature,
+						Code = code
 					});
 				appMailSender.Content = contentMessage;
 

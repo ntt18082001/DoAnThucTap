@@ -82,5 +82,23 @@ namespace ChatServer.Data.Services
 		{
 			return await _unitOfWork.UserRepository.GetListFriendOnline(id);
 		}
+		public async Task AddVerifyCode(AppVerifyCode vCode)
+		{
+			await _unitOfWork.UserRepository.AddVerifyCode(vCode);
+			await _unitOfWork.SaveAsync();
+		}
+		public async Task<AppVerifyCode> GetVerifyCode(string code)
+		{
+			var c = await _unitOfWork.UserRepository.GetVerifyCode(code);
+			if(c != null)
+			{
+				return c;
+			}
+			return null;
+		}
+		public async Task<AppUser> GetUser(string email)
+		{
+			return await _unitOfWork.UserRepository.GetAccountByEmail(email);
+		}
 	}
 }

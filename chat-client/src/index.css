@@ -103,6 +103,9 @@ a.active {
 
 .EmojiPickerReact {
   --epr-picker-height: 500px;
+}
+
+.emoji-position {
   position: absolute !important;
   top: 425px !important;
   right: 65px !important;

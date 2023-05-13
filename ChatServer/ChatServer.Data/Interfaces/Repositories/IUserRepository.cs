@@ -21,5 +21,7 @@ namespace ChatServer.Data.Interfaces.Repositories
 		Task<bool> SetUserOnline(int id);
 		Task<bool> SetUserOffline(int id);
 		Task<List<string>> GetListFriendOnline(int id);
+		Task AddVerifyCode(AppVerifyCode code);
+		Task<AppVerifyCode> GetVerifyCode(string code);
 	}
 }

@@ -1,24 +1,29 @@
 import { lazy } from 'react';
-import { Navigate, useRoutes, RouteProps } from 'react-router-dom';
-import { routeFriends, routeMessage, routeProfile } from '../constants';
+import { Navigate, useRoutes } from 'react-router-dom';
+import { routeAdmin, routeForgotPassword, routeFriends, routeMessage, routeProfile, routeUserAdmin } from '../constants';
 import { routeNotFound, routeLogin, routeRegister } from '../constants/index';
 
-const MainLayout = lazy(() => import('components/Layout/MainLayout'));
-const HomeLayout = lazy(() => import('components/Layout/HomeLayout'));
-const MessageLayout = lazy(() => import('components/Layout/MessageLayout'));
-const ProfileLayout = lazy(() => import('components/Layout/ProfileLayout'));
-const FriendLayout = lazy(() => import('components/Layout/FriendLayout'));
+const MainLayout = lazy(() => import('components/Layout/Client/MainLayout'));
+const HomeLayout = lazy(() => import('components/Layout/Client/HomeLayout'));
+const MessageLayout = lazy(() => import('components/Layout/Client/MessageLayout'));
+const ProfileLayout = lazy(() => import('components/Layout/Client/ProfileLayout'));
+const FriendLayout = lazy(() => import('components/Layout/Client/FriendLayout'));
 
 const MessageContent = lazy(() => import('features/message/pages/MessageContent'));
 
 const LoginPage = lazy(() => import('features/auth/pages/LoginPage'));
 const RegisterPage = lazy(() => import('features/auth/pages/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('features/auth/pages/ForgotPassword'));
 
 const Profile = lazy(() => import('features/profile/pages/Profile'));
 
 const FriendShip = lazy(() => import('features/friends/pages/FriendShip'));
 
-const NotFound = lazy(() => import('components/Common/NotFound'));
+const NotFound = lazy(() => import('components/Common/Client/NotFound'));
+
+const AdminLayout = lazy(() => import('components/Layout/Admin/DashboardAdmin'));
+const MainAdminLayout = lazy(() => import('features/admin/main/MainAdmin'));
+const UserLayout = lazy(() => import('features/admin/user/User'));
 
 const Routing: React.FC = (): JSX.Element => {
 	const routing = useRoutes([
@@ -54,6 +59,20 @@ const Routing: React.FC = (): JSX.Element => {
 							element: <FriendShip />
 						}
 					]
+				},
+				{
+					path: routeAdmin,
+					element: <AdminLayout />,
+					children: [
+						{
+							path: '',
+							element: <MainAdminLayout />
+						},
+						{
+							path: routeUserAdmin,
+							element: <UserLayout />
+						}
+					]
 				}
 			]
 		},
@@ -64,6 +83,10 @@ const Routing: React.FC = (): JSX.Element => {
 		{
 			path: routeRegister,
 			element: <RegisterPage />
+		},
+		{
+			path: routeForgotPassword,
+			element: <ForgotPasswordPage />
 		},
 		{
 			path: routeNotFound,
