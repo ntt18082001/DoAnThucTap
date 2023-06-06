@@ -2,12 +2,14 @@
 using ChatServer.Data.Entities;
 using ChatServer.Shared.DTOs;
 using ChatServer.Shared.DTOs.Friends;
+using ChatServer.Shared.DTOs.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace ChatServer.Data.Interfaces.Repositories
 {
@@ -23,5 +25,6 @@ namespace ChatServer.Data.Interfaces.Repositories
 		Task<List<string>> GetListFriendOnline(int id);
 		Task AddVerifyCode(AppVerifyCode code);
 		Task<AppVerifyCode> GetVerifyCode(string code);
+		Task<IPagedList<UserDTO>> GetAllUser(SearchUserDTO search, int userId, int page, int pageSize);
 	}
 }

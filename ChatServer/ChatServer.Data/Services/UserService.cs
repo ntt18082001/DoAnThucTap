@@ -2,12 +2,14 @@
 using ChatServer.Data.Entities;
 using ChatServer.Data.Interfaces.UnitOfWork;
 using ChatServer.Shared.DTOs.Friends;
+using ChatServer.Shared.DTOs.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace ChatServer.Data.Services
 {
@@ -99,6 +101,10 @@ namespace ChatServer.Data.Services
 		public async Task<AppUser> GetUser(string email)
 		{
 			return await _unitOfWork.UserRepository.GetAccountByEmail(email);
+		}
+		public async Task<IPagedList<UserDTO>> GetAllUser(SearchUserDTO search, int userId, int page, int pageSize)
+		{
+			return await _unitOfWork.UserRepository.GetAllUser(search, userId, page, pageSize);
 		}
 	}
 }

@@ -16,6 +16,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace ChatServer.Data.Repositories
 {
@@ -147,6 +148,26 @@ namespace ChatServer.Data.Repositories
 		{
 			return await _context
 				.AppVerifyCodes.SingleOrDefaultAsync(x => x.TokenString.Equals(code));
+		}
+
+		public async Task<IPagedList<UserDTO>> GetAllUser(SearchUserDTO search, int currentUserId, int page, int pageSize)
+		{
+			var query = dbSet.AsNoTracking();
+			if (search.Name != null)
+			{
+				query = query.Where(x => EF.Functions.Like(x.FullName, $"%{search.Name}%"));
+			}
+			var data = await query.Where(x => x.Id != currentUserId)
+					.OrderByDescending(x => x.Id)
+					.Select(x => new UserDTO
+					{
+						Id = x.Id,
+						FullName = x.FullName,
+						Avatar = x.Avatar,
+						Email = x.Email
+					})
+					.ToPagedListAsync(page, pageSize);
+			return data;
 		}
 	}
 }

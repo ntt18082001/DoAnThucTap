@@ -28,6 +28,8 @@
     <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.6" />
+    <PackageReference Include="X.PagedList" Version="8.4.7" />
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="8.4.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\ViewModels\" />
     <Folder Include="wwwroot\avatar\" />
   </ItemGroup>
 

@@ -2,7 +2,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { Box, Grid, IconButton, Paper, Typography } from '@mui/material';
 import { useAppSelector } from 'app/hooks';
 import { selectIsDarkmode } from 'features/darkmode/darkmodeSlice';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { borderColorDarkmode, borderColorDefault } from '../../../../constants';
 import { CssInputBase } from '../../../../utils/CssTextField';
 import { PhotoCamera } from '@mui/icons-material';
@@ -25,6 +25,10 @@ const ConversationFormMessage = (props: Props) => {
     setIsShowEmojiPicker(!isShowEmojiPicker);
   };
 
+  const blurPicker = () => {
+    setIsShowEmojiPicker(false);
+  }
+
   const onClickSelectEmoji = (emojiData: EmojiClickData, event: MouseEvent) => {
     setMessage(message + emojiData.emoji);
   };
@@ -35,6 +39,24 @@ const ConversationFormMessage = (props: Props) => {
       props.onSubmit(message, selectedFile);
     }
   };
+
+  useEffect(() => {
+    // Function to handle click outside of box
+    const handleClickOutside = (event: MouseEvent) => {
+      const box = document.getElementById("box-emoji-id"); // Replace with your box ID
+      if (box && !box.contains(event.target as Node)) {
+        setIsShowEmojiPicker(false);
+      }
+    };
+  
+    // Add event listener when component is mounted
+    document.addEventListener("mousedown", handleClickOutside);
+  
+    // Remove event listener when component is unmounted
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setIsShowEmojiPicker]);
 
   return (
     <Grid
@@ -84,7 +106,7 @@ const ConversationFormMessage = (props: Props) => {
           value={message}
         />
         {isShowEmojiPicker && (
-          <Box className="emoji-position">
+          <Box className="emoji-position" id="box-emoji-id">
             <EmojiPicker onEmojiClick={onClickSelectEmoji} lazyLoadEmojis />
           </Box>
         )}

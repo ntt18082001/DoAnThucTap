@@ -23,7 +23,6 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { selectToken } from 'features/auth/authSlice';
 import { isAdmin } from 'features/auth/handleJwt';
 import { toast } from 'react-toastify';
-import { NavLink } from 'react-router-dom';
 
 function Copyright(props: any) {
   const isDarkmode = useAppSelector(selectIsDarkmode);
@@ -44,7 +43,7 @@ function Copyright(props: any) {
   );
 }
 
-const drawerWidth: number = 240;
+const drawerWidth: number = 300;
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;

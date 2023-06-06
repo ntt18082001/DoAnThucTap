@@ -17,6 +17,7 @@ import { profileApi } from 'features/profile/profile.service';
 import { friendsApi } from 'features/friends/friends.service';
 import { notifyApi } from 'features/notify/notify.service';
 import { messageApi } from 'features/message/message.service';
+import { userApi } from 'features/admin/user/user.service';
 
 const store = configureStore({
   reducer: {
@@ -31,9 +32,10 @@ const store = configureStore({
     friend: friendReducer,
     [notifyApi.reducerPath]: notifyApi.reducer,
     notify: notifyReducer,
-    [messageApi.reducerPath]: messageApi.reducer
+    [messageApi.reducerPath]: messageApi.reducer,
+    [userApi.reducerPath]: userApi.reducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(authApi.middleware, rtkQueryErrorLogger, validateTokenMiddleware, localStorageMiddleware, profileApi.middleware, friendsApi.middleware, notifyApi.middleware, messageApi.middleware)
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(authApi.middleware, rtkQueryErrorLogger, validateTokenMiddleware, localStorageMiddleware, profileApi.middleware, friendsApi.middleware, notifyApi.middleware, messageApi.middleware, userApi.middleware)
 });
 
 setupListeners(store.dispatch);
