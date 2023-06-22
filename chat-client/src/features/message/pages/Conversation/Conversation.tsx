@@ -41,8 +41,10 @@ const Conversation = (props: Props) => {
 			}
       if (file) {
 				formData.append('file', file);
+      } else {
+        formData.append('content', message);
       }
-			formData.append('content', message);
+			
       await sendMessage(formData).unwrap();
     } catch (error) {
       console.log(error);
