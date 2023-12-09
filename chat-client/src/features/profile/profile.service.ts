@@ -39,7 +39,7 @@ export const profileApi = createApi({
       /**
        * providesTags có thể là array hoặc callback return array
        * Nếu có bất kỳ một invalidateTag nào match với providesTags này thì sẽ làm cho getListFreind method chạy lại
-       * và cập nhật lại danh sách các bài post cũng như các tags phía dưới
+       * và cập nhật lại danh sách bạn bè cũng như các tags phía dưới
        */
       providesTags: (result) => {
         /**
